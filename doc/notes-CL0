@@ -1,0 +1,24 @@
+Kristina Frye
+CS 300
+sequ - CL0 Notes
+Homework 2
+
+The 0th implementation of sequ takes two integers as arguments and
+prints a sequence of numbers between them in increments of 1. Success
+returns a 0. Failure returns a 1.
+
+I'm going to need to know how to parse arguments, make sure those arguments
+are integers, and print out a sequence of numbers.
+
+_Parse Arguments_
+http://docs.python.org/2/library/argparse.html has information on how
+to parse command-line arguments
+
+When argparse fails, it returns 2 instead of 1. To meet our specifications,
+this needs to be overwritten. A technique for doing this using try/except is 
+found in:
+http://stackoverflow.com/questions/5943249/python-argparse-and-controlling-overriding-the-exit-status-code
+
+_For/Range_
+The syntax for using a for loop in Python with range can be found here:
+http://docs.python.org/2/tutorial/controlflow.html 

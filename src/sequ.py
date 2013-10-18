@@ -1,6 +1,6 @@
 #!/usr/bin/env python2.7
 
-# Copyright © 2013 Kristina Frye
+# Copyright 2013 Kristina Frye
 # CS 300
 # sequ command, Compliance Level 0
 # October 4, 2013

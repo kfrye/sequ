@@ -1,0 +1,23 @@
+Kristina Frye
+CS 300
+October 18, 2013
+
+sequ - Compliance Level 0
+
+The initial draft will just be a script since it's very simple.
+No functions involved yet.
+
+Parse the arguments from the command line:
+   There should be exactly two arguments ("first" and "last") and both 
+   are integers
+
+   If this is not the case, exit(1) (Failed)
+
+If first > last
+   exit(0) (Success)
+
+for i = first to i = last (inclusive)
+   print i
+
+exit(0) (Success)
+

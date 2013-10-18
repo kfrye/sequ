@@ -1,0 +1,11 @@
+Kristina Frye
+CS 300
+October 16, 2013
+
+Tests for Sequ
+
+Condition:			Result:
+Arguments are not integers	Command fails with error message
+First int > second int		No output. Exit(0)
+
+
