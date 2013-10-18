@@ -22,3 +22,18 @@ http://stackoverflow.com/questions/5943249/python-argparse-and-controlling-overr
 _For/Range_
 The syntax for using a for loop in Python with range can be found here:
 http://docs.python.org/2/tutorial/controlflow.html 
+
+__TESTING__
+
+larger numbers than 100000000 run into memoryerrors on my test machine.
+Will add test case to disallow numbers greater than this since it is
+unlikely anyone will need sequ for a range greater than that.
+
+The python parser accepts "1.1" as an "int", so the sequ command
+will print: 1.1, 2.1, 3.1, for example, instead of disallowing or
+truncating numbers. I can probably add a workaround to disallow this, but
+this would complicate the code. Since the specification says SHOULD, and 
+since Compliance Level 1 will accept floating point numbers, it's probably
+not worth fixing.
+
+

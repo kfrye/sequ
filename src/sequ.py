@@ -32,6 +32,10 @@ except SystemExit:
 if(args.first > args.last):
    exit(0)
 
+if(args.last - args.first):
+   print "The range between first and last must be less than 100000000."
+   exit(1)
+
 # Print the sequential numbers
 for i in range(args.first, args.last + 1):
    print i

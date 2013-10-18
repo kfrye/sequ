@@ -16,6 +16,8 @@ Parse the arguments from the command line:
 If first > last
    exit(0) (Success)
 
+If last - first > 100000000, exit(1) (Failed)
+
 for i = first to i = last (inclusive)
    print i
 
