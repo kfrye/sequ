@@ -23,7 +23,7 @@ _For/Range_
 The syntax for using a for loop in Python with range can be found here:
 http://docs.python.org/2/tutorial/controlflow.html 
 
-__TESTING__
+__TESTING NOTES__
 
 larger numbers than 100000000 run into memoryerrors on my test machine.
 Will add test case to disallow numbers greater than this since it is
@@ -35,5 +35,33 @@ truncating numbers. I can probably add a workaround to disallow this, but
 this would complicate the code. Since the specification says SHOULD, and 
 since Compliance Level 1 will accept floating point numbers, it's probably
 not worth fixing.
+
+When parsing arguments, argparse returns its built-in errors. Looks like
+if I want to customize the errors, I will need to subclass ArgumentParser:
+http://stackoverflow.com/questions/14728376/i-want-python-argparse-to-throw-an-exception-rather-than-usage
+This might be worth doing in the future, but probably isn't necessary right now.
+
+__TESTING RESULTS__
+
+./sequ.py test this: sequ.py: error: argument first: invalid int value: 'test'
+
+./sequ.py 2 1: (no output)
+
+./sequ.py -1 1:
+-1
+0
+1
+
+./sequ.py 1 3
+1
+2
+3
+
+./sequ.py 0 100000001
+The range between first and last must be less than 100000000.
+
+./sequ.py 1 1e10
+usage: sequ.py [-h] first last
+sequ.py: error: argument last: invalid int value: '1e10'
 
 
