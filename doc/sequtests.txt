@@ -15,9 +15,7 @@ First int > second int		      No output. Exit(0)
 
 0 3                              0 1 2 3
 
-0 100000000 > bignums            Shows last ten numbers up to 100000000
-tail bignums
-Note: larger numbers than 100000000 run into memoryerrors on my test machine
+0 100000000                      Shows numbers between 0 and 100000000
  
 1 1e10                           Command fails with error message. 1e10 Not
                                  accepted as an integer
