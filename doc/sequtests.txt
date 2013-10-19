@@ -7,9 +7,9 @@ Compliance Level 0
 
 Condition:			               Result:
 -------------------------------------------------------------------------------
-Arguments are not integers	      Command fails with error message
+Arguments are not integers       Command fails with error message
 
-First int > second int		      No output. Exit(0)
+First int > second int           No output. Exit(0)
 
 -1 1                             -1 0 1
 
@@ -20,5 +20,5 @@ First int > second int		      No output. Exit(0)
 1 1e10                           Command fails with error message. 1e10 Not
                                  accepted as an integer
 
-.1 3                             0.1 1.1 2.1 3.1 4.1
+.1 3                             Command fails with error message.                        
 

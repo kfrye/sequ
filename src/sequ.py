@@ -32,6 +32,7 @@ except SystemExit:
 if(args.first > args.last):
    exit(0)
 
+# Limit the range so my computer doesn't run out of memory
 if(args.last - args.first > 100000000):
    print "The range between first and last must be less than 100000000."
    exit(1)
