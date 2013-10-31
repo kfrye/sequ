@@ -1,0 +1,88 @@
+Kristina Frye
+CS 300
+October 29, 2013
+Notes for CL1
+
+Redmine repo: https://projects.cecs.pdx.edu/projects/masseycs300-kfrye
+
+Compliance Level 1 spec:
+
+   Compliance Level 1 of sequ adds the full functionality of GNU Coreutils seq.
+   This includes the "--format", "--separator", "--equal-width", "--help" and
+   "--version" arguments (as well as the one-character abbreviations of these),
+   the increment argument, and support for floating-point numbers. The sequ
+   initialization and increment arguments are now optional, as per the seq spec.
+     
+   The sequ "--format" specifier MAY format floating-point numbers differently
+   than seq, but it MUST follow some well-described and reasonable
+   floating-point formatting standard.
+
+   Backslash-escapes in the "-s" argument string MUST be processed as in C
+   printf(3).
+
+After combining this description with the GNU Coreutils spec, we have the 
+following requirements:
+
+1. seq [option]... last: prints numbers from 1 to last in increments of 1
+2. seq [option]... first last: prints numbers from first to last in increments
+   of 1
+3. seq [option]... first increment last: prints numbers from first to last
+   using specified increments 
+
+4. Options supported:
+
+   4.1 -f format, --format=format
+       Print all numbers using format. Format must contain exactly one of the
+       printf-style floating point conversion specifications:
+       (All conversion specifications have the same meaning as with 'printf')
+
+      4.1.1: %a: hexadecimal format. Lower-case letters 
+
+      4.1.2: %e: double value in standard form: [-]d.ddd e[+/-]ddd 
+
+      4.1.3: %f: double in fixed-point notation. Infinity is printed as inf
+
+      4.1.4: %g: double in either normal or exp format, whichever is more
+             appropriate for the magnitude. Lower case letters
+
+      4.1.5: %A: See 4.1.1. Use upper-case letters. 
+
+      4.1.6: %E: See 4.1.2. Use upper-case E.
+
+      4.1.7: %F: See 4.1.3. Infinitity is printed as INF. 
+
+      4.1.8: %G: See 4.1.4. Use upper case letters. 
+
+      4.1.9: The ‘%’ may be followed by zero or more flags taken from the set
+            ‘-+#0 '’, then an optional width containing one or more digits, then
+            an optional precision consisting of a ‘.’ followed by zero or more 
+            digits. 
+
+         4.1.9.1: -: left justification. - overrides 0 if both are given
+
+         4.1.9.2: +: always prints the sign +. + overrides a space if both are 
+               given
+
+         4.1.9.3: ' ': leave a blank before a positive number
+
+         4.1.9.4: #: Convert to alternate form. Alternate form. For 'g' and 'G',
+               trailing zeros are not removed. For 'f', 'F', 'e', 'E', 'g', 'G',
+               the output always contains a decimal point. For 'x' and 'X',
+               a 0x and 0X, respectively, is prepended to non-zero numbers. 
+
+      4.1.10: format may also contain any number of ‘%%’ conversion
+            specifications.
+ 
+   4.2 -s string, --separator=string: Separate numbers with string; default is
+      a newline. The output always terminates with a newline. 
+
+      4.2.1 Backslash-escapes in the "-s" argument string MUST be processed as
+            in C printf(3).` 
+
+   4.3 -w, --equal-width: Print all numbers with the same width, by padding
+      with leading zeros. first, step, and last should all use a fixed point
+      decimal representation. (To have other kinds of padding, use --format).
+
+   4.4 -h, --help: Print instructions on using the command
+
+   4.5 -v, --version: Print the version number
