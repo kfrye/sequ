@@ -4,22 +4,48 @@ November 2, 2013
 
 sequ - Compliance Level 1
 
-The initial draft will just be a script since it's very simple.
-No functions involved yet.
-
 Parse the arguments from the command line:
-   There should be exactly two arguments ("first" and "last") and both 
-   are integers
+
+   There will be at least one argument (a number). If so, this will be the
+   "last" argument. "first" will be 1, and "increment" will be 1
+
+   There might be two arguments, both numbers. If so, the first argument will be
+   "first" and the second argument will be "last." "Increment" will be 1.
+
+   There might be three arguments, all numbers. If so, the first argument
+   will be "first". The second will be "increment". The third will be "last."
+
+   If the first argument is the string "-f" called "option," then the second
+   argument will be a string called "format," and there will be 1, 2, or 3
+   more arguments, all numbers, as described above. 
+  
+   If the first argument starts with the string "--format", then it can 
+   be parsed into two string arguments separated by a "=" called "option"
+   and "format", which will work the same as above.
+
+   If the first argument is the string "-s" called "option", then it will be
+   followed by a string called "separator." The separator string may contain
+   backslash escapes. It will be followed by 1, 2, or 3 numbers, which
+   will be processed as described above.
+
+   If the first argument starts with the string "--separator", then it
+   can be parsed into two strings separated by a "=" called "option" and
+   "separator" as described above.
+
+   If the first argument starts with a "-w" or "--equal-width" called "option,"
+   then it will be followed by 1, 2, or 3 numbers, as described above.
 
    If this is not the case, exit(1) (Failed)
 
-If first > last
-   exit(0) (Success)
+Other input checking:
+   If first > last
+      exit(0) (Success)
 
-If last - first > 100000000, exit(1) (Failed)
+   If last - first > 100000000, exit(1) (Failed)
 
-for i = first to i = last (inclusive)
+for i = first to i <= last (inclusive)
    print i
+   increment i by "increment"
 
 exit(0) (Success)
 
