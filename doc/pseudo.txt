@@ -1,8 +1,8 @@
 Kristina Frye
 CS 300
-October 18, 2013
+November 2, 2013
 
-sequ - Compliance Level 0
+sequ - Compliance Level 1
 
 The initial draft will just be a script since it's very simple.
 No functions involved yet.

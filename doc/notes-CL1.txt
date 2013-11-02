@@ -36,7 +36,7 @@ following requirements:
        printf-style floating point conversion specifications:
        (All conversion specifications have the same meaning as with 'printf')
 
-      4.1.1: %a: hexadecimal format. Lower-case letters 
+      4.1.1: %a: floating point hexadecimal format. Lower-case letters 
 
       4.1.2: %e: double value in standard form: [-]d.ddd e[+/-]ddd 
 
@@ -67,8 +67,9 @@ following requirements:
 
          4.1.9.4: #: Convert to alternate form. Alternate form. For 'g' and 'G',
                trailing zeros are not removed. For 'f', 'F', 'e', 'E', 'g', 'G',
-               the output always contains a decimal point. For 'x' and 'X',
-               a 0x and 0X, respectively, is prepended to non-zero numbers. 
+               the output always contains a decimal point. 
+
+         4.1.9.5: 0: Use zero-padding
 
       4.1.10: format may also contain any number of ‘%%’ conversion
             specifications.
