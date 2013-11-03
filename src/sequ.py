@@ -17,6 +17,7 @@ parser.add_argument('first', help='The starting integer', type=float, nargs='?',
 parser.add_argument('increment', help='The increment between numbers',
    type=float, nargs='?', default=1)
 parser.add_argument('last', help='The ending integer', type=float)
+parser.add_argument('-f', '--format', help='Special formatting', nargs='?')
 
 # We use a try/except in order to override the exit status code with 1
 # This code is from:
@@ -39,7 +40,10 @@ if(args.last - args.first > 100000000):
 # Print the sequential numbers
 i = args.first
 while(i <= args.last):
-   print i
+   if args.format == None:
+      print "%g" % i
+   else:
+      print args.format % i 
    i = i + args.increment
  
 # Success!
