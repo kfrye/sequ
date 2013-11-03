@@ -7,17 +7,36 @@
 #
 
 # argparse allows us to easily parse the input arguments
+from __future__ import print_function
 import argparse
 
+# Set up the parser
 parser = argparse.ArgumentParser(description='The sequ command prints a '
    'sequence of numbers between the "first" and the "last" argument '
-   'in increments of 1.')
-parser.add_argument('first', help='The starting integer', type=float, nargs='?',
-   default=1)
-parser.add_argument('increment', help='The increment between numbers',
+   'in increments of "increment," which defaults to 1.')
+
+# We do not allow multiple simultaneous print options
+group = parser.add_mutually_exclusive_group()
+
+# Get first number. This is optional and defaults to 1
+parser.add_argument('first', 
+   help='The starting integer (default=1)', type=float, nargs='?', default=1)
+
+# Get increment number. This is optional and defaults to 1
+parser.add_argument('increment', 
+   help='The increment between numbers (default=1)', 
    type=float, nargs='?', default=1)
+
+# Get the last number. This number is required
 parser.add_argument('last', help='The ending integer', type=float)
-parser.add_argument('-f', '--format', help='Special formatting', nargs='?')
+
+# Get the options. Can only specify 1.
+group.add_argument('-f', '--format', help='Special formatting', nargs='?')
+group.add_argument('-w', '--equal-width', dest='equalwidth',
+   action='store_true', 
+   help='Print all numbers with same width with zero padding, if necessary.')
+group.add_argument('-s', '--separator', 
+   help='Print with separator instead of each number on own line', nargs='?')
 
 # We use a try/except in order to override the exit status code with 1
 # This code is from:
@@ -34,16 +53,52 @@ if(args.first > args.last):
 
 # Limit the range so my computer doesn't run out of memory
 if(args.last - args.first > 100000000):
-   print "The range between first and last must be less than 100000000."
+   print("The range between first and last must be less than 100000000.")
    exit(1)
 
+# This function is used to get the maximum character length. Since
+# this might change depending upon whether a decimal point is used and
+# whether the increment is factional, we will iterate through the
+# entire loop to get the maximum length.
+# This function is only used when the option is set to -w (equal-width)
+def get_max_length(first, last, increment):
+   max_length = 0
+   current_num = first 
+   while(current_num <= last):
+      length = len(str("{0:g}".format(current_num)))
+      if(max_length < length):
+         max_length = length
+      current_num = current_num + increment
+   return max_length
+ 
 # Print the sequential numbers
-i = args.first
+# Using a while loop here instead of a for loop because python
+# does not allow range to use floats
+
+i = args.first # Initializing count
 while(i <= args.last):
-   if args.format == None:
-      print "%g" % i
+
+   # Print with equal character width using leading zeroes
+   if args.equalwidth == True:
+      length = get_max_length(args.first, args.last, args.increment) 
+      print("{0:0{width}g}".format(i, width=length))
+
+   # Print with special formatting
+   elif args.format != None:
+      print(args.format % i)
+
+   # Print with separator. See:
+   # http://stackoverflow.com/questions/255147/
+   #   how-do-i-keep-python-print-from-adding-spaces
+   elif args.separator != None:
+      print("{0:0g}".format(i), end='')
+      print(args.separator, end="") 
+
+   # Normal printing (no options)
    else:
-      print args.format % i 
+      print("{0:g}".format(i))
+
+   # Increment by specified incrementer (defaults to 1)
    i = i + args.increment
  
 # Success!
