@@ -83,7 +83,8 @@ def get_max_length(first, last, increment):
 # does not allow range to use floats
 
 counter = args.first # Initializing count
-while(counter < args.last):
+run_loop = True
+while(run_loop == True):
 
    # Print with equal character width using leading zeroes
    if args.equalwidth == True:
@@ -107,6 +108,12 @@ while(counter < args.last):
 
    # Increment by specified incrementer (defaults to 1)
    counter = counter + args.increment
+   if(args.increment > 0 and counter <= args.last):
+      run_loop = True
+   elif(args.increment < 0 and counter >= args.last):
+      run_loop = True
+   else:
+      run_loop = False
  
 # Success!
 exit(0)
