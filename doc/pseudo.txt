@@ -37,6 +37,12 @@ Parse the arguments from the command line:
 
    If this is not the case, exit(1) (Failed)
 
+In order to allow negative increments:
+
+counter = first
+while (abs(counter - last) > 1)
+   counter = counter + increment 
+
 Other input checking:
    If first > last
       exit(0) (Success)

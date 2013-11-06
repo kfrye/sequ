@@ -50,15 +50,17 @@ except SystemExit:
 
 # The first argument is not allowed to be bigger than the second 
 if(args.first > args.last):
-   exit(0)
+   if(args.increment > 0):
+      exit(0)
 
 # Limit the range so my computer doesn't run out of memory
-if(args.last - args.first > 100000000):
+if(abs(args.last - args.first) > 100000000):
    print("The range between first and last must be less than 100000000.")
    exit(1)
 
-if(args.increment <= 0):
-   print("Increment values must be greater than 0")
+# The increment cannot be zero
+if(args.increment == 0):
+   print("The increment cannot be 0")
    exit(1)
 
 # This function is used to get the maximum character length. Since
@@ -80,31 +82,31 @@ def get_max_length(first, last, increment):
 # Using a while loop here instead of a for loop because python
 # does not allow range to use floats
 
-i = args.first # Initializing count
-while(i <= args.last):
+counter = args.first # Initializing count
+while(counter < args.last):
 
    # Print with equal character width using leading zeroes
    if args.equalwidth == True:
       length = get_max_length(args.first, args.last, args.increment) 
-      print("{0:0{width}g}".format(i, width=length))
+      print("{0:0{width}g}".format(counter, width=length))
 
    # Print with special formatting
    elif args.string_format != None:
-      print(args.string_format % i)
+      print(args.string_format % counter)
 
    # Print with separator. See:
    # http://stackoverflow.com/questions/255147/
    #   how-do-i-keep-python-print-from-adding-spaces
    elif args.separator != None:
-      print("{0:0g}".format(i), end='')
+      print("{0:0g}".format(counter), end='')
       print(args.separator, end="") 
 
    # Normal printing (no options)
    else:
-      print("{0:g}".format(i))
+      print("{0:g}".format(counter))
 
    # Increment by specified incrementer (defaults to 1)
-   i = i + args.increment
+   counter = counter + args.increment
  
 # Success!
 exit(0)
