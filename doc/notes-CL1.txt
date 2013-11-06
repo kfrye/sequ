@@ -87,3 +87,15 @@ following requirements:
    4.4 -h, --help: Print instructions on using the command
 
    4.5 -v, --version: Print the version number
+
+November 3, 2013:
+
+Discovered that the special formatting for Python (%x, %g, etc) is somewhat
+different than the standard c printf formatting. For instance, %x is used
+for hex format and %a is not available. I'm guessing that this is probably
+okay since the actual formatting was not specified in the assignment spec,
+but it will also mean that sequ will not produce the same output as seq,
+and my spec, which was based upon c printf, will have to change.
+
+Proceding with assignment as if the python string formatting is sufficient
+for the assignment.

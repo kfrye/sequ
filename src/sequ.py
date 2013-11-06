@@ -31,7 +31,8 @@ parser.add_argument('increment',
 parser.add_argument('last', help='The ending integer', type=float)
 
 # Get the options. Can only specify 1.
-group.add_argument('-f', '--format', help='Special formatting', nargs='?')
+group.add_argument('-f', '--format', dest='string_format', 
+   help='Special formatting', nargs='?')
 group.add_argument('-w', '--equal-width', dest='equalwidth',
    action='store_true', 
    help='Print all numbers with same width with zero padding, if necessary.')
@@ -54,6 +55,10 @@ if(args.first > args.last):
 # Limit the range so my computer doesn't run out of memory
 if(args.last - args.first > 100000000):
    print("The range between first and last must be less than 100000000.")
+   exit(1)
+
+if(args.increment <= 0):
+   print("Increment values must be greater than 0")
    exit(1)
 
 # This function is used to get the maximum character length. Since
@@ -84,8 +89,8 @@ while(i <= args.last):
       print("{0:0{width}g}".format(i, width=length))
 
    # Print with special formatting
-   elif args.format != None:
-      print(args.format % i)
+   elif args.string_format != None:
+      print(args.string_format % i)
 
    # Print with separator. See:
    # http://stackoverflow.com/questions/255147/
