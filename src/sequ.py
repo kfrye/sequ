@@ -76,8 +76,16 @@ def get_max_length(first, last, increment):
       if(max_length < length):
          max_length = length
       current_num = current_num + increment
+   print('Max length is: ', max_length)
    return max_length
- 
+
+# The max_length loop needs to be run backwards if the increment is negative 
+if(args.equalwidth == True):
+   if(args.increment > 0):
+      length = get_max_length(args.first, args.last, args.increment)
+   else:
+      length = get_max_length(args.last, args.first, abs(args.increment))
+
 # Print the sequential numbers
 # Using a while loop here instead of a for loop because python
 # does not allow range to use floats
@@ -88,7 +96,6 @@ while(run_loop == True):
 
    # Print with equal character width using leading zeroes
    if args.equalwidth == True:
-      length = get_max_length(args.first, args.last, args.increment) 
       print("{0:0{width}g}".format(counter, width=length))
 
    # Print with special formatting

@@ -40,18 +40,25 @@ Parse the arguments from the command line:
 In order to allow negative increments:
 
 counter = first
-while (abs(counter - last) > 1)
+run_loop = true
+while (run_loop == true)
+   print stuff
    counter = counter + increment 
+
+   if(increment > 0 and counter <= last)
+      run_loop = true
+   else if(increment < 0 and counter >= last)
+      run_loop = true
+   else
+      run_loop = false
+
+Note about above check: I could combine the if/else statements into fewer
+lines of code, but I thought this would make it a bit easier to read
 
 Other input checking:
    If first > last
-      exit(0) (Success)
+      if increment > 0
+         exit(0) (Success)
 
-   If last - first > 100000000, exit(1) (Failed)
-
-for i = first to i <= last (inclusive)
-   print i
-   increment i by "increment"
-
-exit(0) (Success)
+   If abs(last - first) > 100000000, exit(1) (Failed)
 
