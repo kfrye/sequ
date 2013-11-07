@@ -9,6 +9,7 @@
 # argparse allows us to easily parse the input arguments
 from __future__ import print_function
 import argparse
+from decimal import Decimal
 
 # Set up the parser
 parser = argparse.ArgumentParser(description='The sequ command prints a '
@@ -63,28 +64,51 @@ if(args.increment == 0):
    print("The increment cannot be 0")
    exit(1)
 
-# This function is used to get the maximum character length. Since
-# this might change depending upon whether a decimal point is used and
-# whether the increment is factional, we will iterate through the
-# entire loop to get the maximum length.
 # This function is only used when the option is set to -w (equal-width)
+# This function is used to get the maximum character length and the
+# decimal precision. Since this might change depending upon whether a decimal 
+# point is used and whether the increment is factional, we will iterate 
+# through the entire loop to get the maximum length.
+# Need to be able to find the number of decimal places of a 
+# formatted string:
+# http://stackoverflow.com/questions/6189956/easy-way-of-finding-decimal-places
+
 def get_max_length(first, last, increment):
-   max_length = 0
-   current_num = first 
-   while(current_num <= last):
-      length = len(str("{0:g}".format(current_num)))
+   max_length = 0       #initialize the max lengths
+   max_dec_length = 0
+   current_num = first  #initialize the current number counter
+   run_loop = True
+
+   while(run_loop == True):
+      formatted_string = str("{0:g}".format(current_num))
+
+      # Calculate the string lengths and precision
+      length = len(formatted_string)
+      dec_length = abs(Decimal(formatted_string).as_tuple().exponent)
+      
+      # Check if greater than max lengths
       if(max_length < length):
          max_length = length
-      current_num = current_num + increment
-   print('Max length is: ', max_length)
-   return max_length
+      if(max_dec_length < dec_length):
+         max_dec_length = dec_length
 
-# The max_length loop needs to be run backwards if the increment is negative 
+      #increment the number
+      current_num = current_num + increment
+      
+      #check if the loop should continue 
+      if(increment > 0 and current_num <= last):
+         run_loop = True
+      elif(increment < 0 and current_num >= last):
+         run_loop = True
+      else:
+         run_loop = False
+      
+   return max_length, dec_length
+
+# Run this calculation outside of the loop because it only
+# needs to be done once
 if(args.equalwidth == True):
-   if(args.increment > 0):
-      length = get_max_length(args.first, args.last, args.increment)
-   else:
-      length = get_max_length(args.last, args.first, abs(args.increment))
+   length = get_max_length(args.first, args.last, args.increment)
 
 # Print the sequential numbers
 # Using a while loop here instead of a for loop because python
@@ -96,7 +120,8 @@ while(run_loop == True):
 
    # Print with equal character width using leading zeroes
    if args.equalwidth == True:
-      print("{0:0{width}g}".format(counter, width=length))
+      print("{0:0{width}.{precision}f}".format(counter, width=length[0],
+         precision=length[1]))
 
    # Print with special formatting
    elif args.string_format != None:
@@ -106,7 +131,7 @@ while(run_loop == True):
    # http://stackoverflow.com/questions/255147/
    #   how-do-i-keep-python-print-from-adding-spaces
    elif args.separator != None:
-      print("{0:0g}".format(counter), end='')
+      print("{0:g}".format(counter), end='')
       print(args.separator, end="") 
 
    # Normal printing (no options)

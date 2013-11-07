@@ -99,3 +99,23 @@ and my spec, which was based upon c printf, will have to change.
 
 Proceding with assignment as if the python string formatting is sufficient
 for the assignment.
+
+November 6, 2013:
+
+Ran into some trouble with the equal-width option, particularly when
+incrementing backwards.
+
+Added a check to find the precision of each number in the loop, and using
+that precision in the print loop as well as the width. I also had to add
+in a flag in the get_max_length function instead of just flipping the
+last and first arguments. The flip wasn't working because 3.1 to 1 should
+be 3.1 2.1 1.1, but if I flip the arguments, it's 1 2 3. The decimal
+points don't work right. So I have to actually count backwards in the
+get_max_length loop when incrementing downwards in order to find the correct
+precision.
+
+This exercise also made me figure out how to use both the "width" and the
+"precision" options with the string format. I had to switch the equal-width
+printing from using %g to using %f because precision doesn't seem to work
+with %g. Since I'm discovering the actual precision that should be used for
+the shortest accurate string, it doesn't actually matter
