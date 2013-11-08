@@ -36,40 +36,36 @@ following requirements:
        printf-style floating point conversion specifications:
        (All conversion specifications have the same meaning as with 'printf')
 
-      4.1.1: %a: floating point hexadecimal format. Lower-case letters 
+      4.1.1: %x: hexadecimal format. Lower-case letters 
 
-      4.1.2: %e: double value in standard form: [-]d.ddd e[+/-]ddd 
+      4.1.2: %f: double in fixed-point notation. Infinity is printed as inf
 
-      4.1.3: %f: double in fixed-point notation. Infinity is printed as inf
-
-      4.1.4: %g: double in either normal or exp format, whichever is more
+      4.1.3: %g: double in either normal or exp format, whichever is more
              appropriate for the magnitude. Lower case letters
 
-      4.1.5: %A: See 4.1.1. Use upper-case letters. 
+      4.1.4: %A: See 4.1.1. Use upper-case letters. 
 
-      4.1.6: %E: See 4.1.2. Use upper-case E.
+      4.1.5: %F: See 4.1.3. Infinitity is printed as INF. 
 
-      4.1.7: %F: See 4.1.3. Infinitity is printed as INF. 
+      4.1.6: %G: See 4.1.4. Use upper case letters. 
 
-      4.1.8: %G: See 4.1.4. Use upper case letters. 
-
-      4.1.9: The ‘%’ may be followed by zero or more flags taken from the set
+      4.1.7: The ‘%’ may be followed by zero or more flags taken from the set
             ‘-+#0 '’, then an optional width containing one or more digits, then
             an optional precision consisting of a ‘.’ followed by zero or more 
             digits. 
 
-         4.1.9.1: -: left justification. - overrides 0 if both are given
+         4.1.7.1: -: left justification. - overrides 0 if both are given
 
-         4.1.9.2: +: always prints the sign +. + overrides a space if both are 
+         4.1.7.2: +: always prints the sign +. + overrides a space if both are 
                given
 
-         4.1.9.3: ' ': leave a blank before a positive number
+         4.1.7.3: ' ': leave a blank before a positive number
 
-         4.1.9.4: #: Convert to alternate form. Alternate form. For 'g' and 'G',
-               trailing zeros are not removed. For 'f', 'F', 'e', 'E', 'g', 'G',
+         4.1.7.4: #: Convert to alternate form. Alternate form. For 'g' and 'G',
+               trailing zeros are not removed. For 'f', 'F', 'g', 'G',
                the output always contains a decimal point. 
 
-         4.1.9.5: 0: Use zero-padding
+         4.1.7.5: 0: Use zero-padding
 
       4.1.10: format may also contain any number of ‘%%’ conversion
             specifications.
@@ -119,3 +115,38 @@ This exercise also made me figure out how to use both the "width" and the
 printing from using %g to using %f because precision doesn't seem to work
 with %g. Since I'm discovering the actual precision that should be used for
 the shortest accurate string, it doesn't actually matter
+
+November 7, 2013:
+
+Fiddled some more to get the equal-width option working better. The width
+and precision need to be correct or the output will not be right. It 
+seems to be working correctly now.
+
+Created an automated way to test sequ:
+
+In the src/tests directory:
+   -  test-list: contains arguments to be input into seq and sequ. This 
+      generates files automatically named from the arguments.
+
+   -  create-seq-files.sh. To be used as: 
+      ./create-seq-files seq < test-list 
+      ./create-seq-files ./sequ.py < test-list
+      This generates files from seq and sequ.py, taking the arguments from
+      test-list
+
+   -  ./run-compare.sh seq ./sequ.py < test-list > test-results.txt
+      This compares the test files and outputs whether each
+      test passed for failed into "test-results.txt"
+
+In some cases, the test "failed," but the failure exposed a bug in seq
+instead of sequ. For example, seq -w 10 -.1 9.9 gives:
+   10.0
+   9.9
+
+And sequ gives: 
+   10.0
+   09.9
+
+I changed the seq output files so that the compare test will pass, but
+once the create-seq-files script is run again, that update will be
+lost.  
