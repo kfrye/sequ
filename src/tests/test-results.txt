@@ -1,0 +1,53 @@
+Test 10: passed
+Test -10 10 10: passed
+Test -.1 .1 .11: passed
+Test 1 -1 0: passed
+Test 1 -1 -1: passed
+Test 0.8 0.1 0.9: passed
+Test 0.1 0.99 1.99: passed
+Test 10.8 0.1 10.95: passed
+Test 0.1 -0.1 -0.2: passed
+Test 0.8 1e-1 0.9: passed
+Test 0.8 0.1 0.9000000000000: passed
+Test .8 1e-2 .81: passed
+Test .89999 1e-7 .8999901: passed
+Test -w 1 -1 -1: passed
+Test -w -.1 .1 .11: passed
+Test -w 1 3.0: passed
+Test -w .8 1e-2 .81: passed
+Test -w 1 .5 2: passed
+Test -w +1 2: passed
+Test -w "    .1"  "    .1": passed
+Test -w 9 0.5 10: passed
+Test -w -- -1e-3 1: passed
+Test -w -- -1e-003 1: passed
+Test -w -- -1.e-3 1: passed
+Test -w -- -1.0e-4 1: passed
+Test -w 999 1e3: passed
+Test -w -1 1.0 0: passed
+Test -w 10 -.1 9.9: passed
+Test -f %2.1f 1.5 .5 2: passed
+Test -f %0.1f 1.5 .5 2: passed
+Test -f %.1f  1.5 .5 2: passed
+Test -f %3.0f 1 2: passed
+Test -f %-3.0f 1 2: passed
+Test -f %+3.0f 1 2: passed
+Test -f %0+3.0f 1 2: passed
+Test -f %0+.0f 1 2: passed
+Test -f %%%g%% 1: passed
+Test -0.1 0.1 2: failed
+Test 000 2: passed
+Test 000 02: passed
+Test 00 02: passed
+Test 0 02: passed
+Test -s, 1 3: seq.-s,_1_3 ./sequ.py.-s,_1_3 differ: byte 2, line 1
+failed
+Test -s, 1 1: seq.-s,_1_1 ./sequ.py.-s,_1_1 differ: byte 2, line 1
+failed
+Test -s,, 1 3: seq.-s,,_1_3 ./sequ.py.-s,,_1_3 differ: byte 8, line 1
+failed
+Test 1 3 1: failed
+Test 1 1 4.2: passed
+Test 4: passed
+Test 1 4: passed
+Test 1 1 4: passed

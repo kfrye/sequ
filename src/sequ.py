@@ -79,9 +79,10 @@ def check_inputs(args):
 # This function prints the number sequence
 def print_output(args):
 
+   precision = get_max_precision(args.first, args.last, args.increment)
+   
    # Find the formatted string width, if needed
    if(args.equalwidth == True):
-      precision = get_max_precision(args.first, args.last, args.increment)
       length = get_max_length(args.first, args.last, args.increment, precision)
 
    current_num = args.first 
@@ -108,11 +109,7 @@ def print_output(args):
       # Find the decimal precision so that we can print it correctly without
       # rounding 
       else:
-         if(current_num.is_integer()):
-            print("{0:g}".format(current_num))
-         else:  
-            dec_length = abs(Decimal(str(current_num)).as_tuple().exponent)
-            print("{0:.{precision}f}".format(current_num, precision=dec_length))
+         print("{0:.{prec}f}".format(current_num, prec=precision))
 
       # Increment by specified incrementer (defaults to 1)
       current_num += args.increment
