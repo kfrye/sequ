@@ -11,6 +11,116 @@ from __future__ import print_function
 import argparse
 from decimal import Decimal
 
+# This function determines if a loop should continue given the current number,
+# the increment, and the last number
+def continue_loop(current_num, last, increment):
+   if(increment > 0 and current_num <= last):
+      run_loop = True
+   elif(increment < 0 and current_num >= last):
+      run_loop = True
+   else:
+      run_loop = False
+   return run_loop
+
+# This function gets the maximum precision needed by the numbers
+# It is only used when the equal-width option is selected
+# http://stackoverflow.com/questions/6189956/easy-way-of-finding-decimal-places
+def get_max_precision(first, last, increment):
+   max_dec_length = 0
+   current_num = first
+   run_loop = True
+
+   while(run_loop == True):
+      if(current_num.is_integer()):
+         dec_length = 0
+      else:
+         dec_length = abs(Decimal(str(current_num)).as_tuple().exponent) 
+      
+      if(max_dec_length < dec_length):
+         max_dec_length = dec_length
+
+      current_num += increment
+      run_loop = continue_loop(current_num, last, increment)
+
+   return max_dec_length
+ 
+# This function gets the maximum width needed by the formatted number
+# strings given a specified precision
+def get_max_length(first, last, increment, precision):
+   max_length = 0       #initialize the max lengths
+   current_num = first  #initialize the current number 
+   run_loop = True
+
+   while(run_loop == True):
+
+      # Calculate the string lengths and precision
+      length = len("{0:.{prec}f}".format(current_num, prec=precision))
+
+      if(max_length < length):
+         max_length = length
+
+      current_num += increment
+      run_loop = continue_loop(current_num, last, increment)
+ 
+   return max_length
+
+# This function runs a few checks of the input for validity
+def check_inputs(args):
+   # Exit with success if nothing to print
+   if(args.first > args.last):
+      if(args.increment > 0):
+         exit(0) 
+
+   # Limit the range so my computer doesn't run out of memory
+   if(abs(args.last - args.first) > 100000000):
+      print("The range between first and last must be less than 100000000.")
+      exit(1) 
+
+# This function prints the number sequence
+def print_output(args):
+
+   # Find the formatted string width, if needed
+   if(args.equalwidth == True):
+      precision = get_max_precision(args.first, args.last, args.increment)
+      length = get_max_length(args.first, args.last, args.increment, precision)
+
+   current_num = args.first 
+   run_loop = True
+   while(run_loop == True):
+
+      # Print with specified width and precision (equal-width)
+      if args.equalwidth == True:
+         print("{0:0{width}.{prec}f}".format(current_num, width=length,
+            prec=precision)) 
+
+      # Print with special formatting
+      elif args.string_format != None:
+         print(args.string_format % current_num)
+
+      # Print with separator. See:
+      # http://stackoverflow.com/questions/255147/
+      #   how-do-i-keep-python-print-from-adding-spaces
+      elif args.separator != None:
+         print("{0:g}".format(current_num), end='')
+         print(args.separator, end="") 
+
+      # Normal printing (no options).
+      # Find the decimal precision so that we can print it correctly without
+      # rounding 
+      else:
+         if(current_num.is_integer()):
+            print("{0:g}".format(current_num))
+         else:  
+            dec_length = abs(Decimal(str(current_num)).as_tuple().exponent)
+            print("{0:.{precision}f}".format(current_num, precision=dec_length))
+
+      # Increment by specified incrementer (defaults to 1)
+      current_num += args.increment
+      run_loop = continue_loop(current_num, args.last, args.increment)
+    
+   # Success!
+   exit(0)
+
 # Set up the parser
 parser = argparse.ArgumentParser(description='The sequ command prints a '
    'sequence of numbers between the "first" and the "last" argument '
@@ -21,12 +131,12 @@ group = parser.add_mutually_exclusive_group()
 
 # Get first number. This is optional and defaults to 1
 parser.add_argument('first', 
-   help='The starting integer (default=1)', type=float, nargs='?', default=1)
+   help='The starting integer (default=1)', type=float, nargs='?', default=1.0)
 
 # Get increment number. This is optional and defaults to 1
 parser.add_argument('increment', 
    help='The increment between numbers (default=1)', 
-   type=float, nargs='?', default=1)
+   type=float, nargs='?', default=1.0)
 
 # Get the last number. This number is required
 parser.add_argument('last', help='The ending integer', type=float)
@@ -49,103 +159,5 @@ try:
 except SystemExit:
    exit(1)
 
-# The first argument is not allowed to be bigger than the second 
-if(args.first > args.last):
-   if(args.increment > 0):
-      exit(0)
-
-# Limit the range so my computer doesn't run out of memory
-if(abs(args.last - args.first) > 100000000):
-   print("The range between first and last must be less than 100000000.")
-   exit(1)
-
-# The increment cannot be zero
-if(args.increment == 0):
-   print("The increment cannot be 0")
-   exit(1)
-
-# This function is only used when the option is set to -w (equal-width)
-# This function is used to get the maximum character length and the
-# decimal precision. Since this might change depending upon whether a decimal 
-# point is used and whether the increment is factional, we will iterate 
-# through the entire loop to get the maximum length.
-# Need to be able to find the number of decimal places of a 
-# formatted string:
-# http://stackoverflow.com/questions/6189956/easy-way-of-finding-decimal-places
-
-def get_max_length(first, last, increment):
-   max_length = 0       #initialize the max lengths
-   max_dec_length = 0
-   current_num = first  #initialize the current number counter
-   run_loop = True
-
-   while(run_loop == True):
-      formatted_string = str("{0:g}".format(current_num))
-
-      # Calculate the string lengths and precision
-      length = len(formatted_string)
-      dec_length = abs(Decimal(formatted_string).as_tuple().exponent)
-      
-      # Check if greater than max lengths
-      if(max_length < length):
-         max_length = length
-      if(max_dec_length < dec_length):
-         max_dec_length = dec_length
-
-      #increment the number
-      current_num = current_num + increment
-      
-      #check if the loop should continue 
-      if(increment > 0 and current_num <= last):
-         run_loop = True
-      elif(increment < 0 and current_num >= last):
-         run_loop = True
-      else:
-         run_loop = False
-      
-   return max_length, dec_length
-
-# Run this calculation outside of the loop because it only
-# needs to be done once
-if(args.equalwidth == True):
-   length = get_max_length(args.first, args.last, args.increment)
-
-# Print the sequential numbers
-# Using a while loop here instead of a for loop because python
-# does not allow range to use floats
-
-counter = args.first # Initializing count
-run_loop = True
-while(run_loop == True):
-
-   # Print with equal character width using leading zeroes
-   if args.equalwidth == True:
-      print("{0:0{width}.{precision}f}".format(counter, width=length[0],
-         precision=length[1]))
-
-   # Print with special formatting
-   elif args.string_format != None:
-      print(args.string_format % counter)
-
-   # Print with separator. See:
-   # http://stackoverflow.com/questions/255147/
-   #   how-do-i-keep-python-print-from-adding-spaces
-   elif args.separator != None:
-      print("{0:g}".format(counter), end='')
-      print(args.separator, end="") 
-
-   # Normal printing (no options)
-   else:
-      print("{0:g}".format(counter))
-
-   # Increment by specified incrementer (defaults to 1)
-   counter = counter + args.increment
-   if(args.increment > 0 and counter <= args.last):
-      run_loop = True
-   elif(args.increment < 0 and counter >= args.last):
-      run_loop = True
-   else:
-      run_loop = False
- 
-# Success!
-exit(0)
+check_inputs(args)
+print_output(args)
