@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh 
 
 read args
 while [ -n "$args" ]; do

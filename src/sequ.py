@@ -8,12 +8,18 @@
 
 # argparse allows us to easily parse the input arguments
 from __future__ import print_function
+import sys
 import argparse
 from decimal import Decimal
+from decimal import getcontext 
+
+def get_version():
+   return 'sequ version 1.00, written by Kristina Frye'
 
 # This function determines if a loop should continue given the current number,
 # the increment, and the last number
 def continue_loop(current_num, last, increment):
+   # Create a delta for floating point weirdness 
    if(increment > 0 and current_num <= last):
       run_loop = True
    elif(increment < 0 and current_num >= last):
@@ -29,14 +35,19 @@ def get_max_precision(first, last, increment):
    max_dec_length = 0
    current_num = first
    run_loop = True
-
+    
+   # I am running a loop over all the numbers because some middle numbers
+   # may need more decimal places than the first and last numbers. 
    while(run_loop == True):
       if(current_num.is_integer()):
          dec_length = 0
       else:
          dec_length = abs(Decimal(str(current_num)).as_tuple().exponent) 
-      
-      if(max_dec_length < dec_length):
+      # The magic number '28' has been added below because sometimes
+      # floating point representations aren't correct. We are
+      # going to ignore representations more than 28 decimal places
+      # and truncate them 
+      if(max_dec_length < dec_length and dec_length < 28):
          max_dec_length = dec_length
 
       current_num += increment
@@ -70,6 +81,9 @@ def check_inputs(args):
    if(args.first > args.last):
       if(args.increment > 0):
          exit(0) 
+   else:
+      if(args.increment < 0):
+         exit(0)
 
    # Limit the range so my computer doesn't run out of memory
    if(abs(args.last - args.first) > 100000000):
@@ -78,14 +92,23 @@ def check_inputs(args):
 
 # This function prints the number sequence
 def print_output(args):
-
+  
+   # Find the greatest decimal precision needed given the first and last
+   # arguments and the increment. This is needed for correct printing
+   # although we lose efficiently because it's using a loop
    precision = get_max_precision(args.first, args.last, args.increment)
-   
+
+   # Set the precision used by Decimal. This is to avoid floating point
+   # problems when incrementing
+   getcontext().prec = precision + 1
+ 
    # Find the formatted string width, if needed
    if(args.equalwidth == True):
       length = get_max_length(args.first, args.last, args.increment, precision)
 
-   current_num = args.first 
+   # Convert to Decimal to avoid bad floating point representations
+   current_num = Decimal(args.first)
+
    run_loop = True
    while(run_loop == True):
 
@@ -112,33 +135,26 @@ def print_output(args):
          print("{0:.{prec}f}".format(current_num, prec=precision))
 
       # Increment by specified incrementer (defaults to 1)
-      current_num += args.increment
+      current_num += Decimal(args.increment)
       run_loop = continue_loop(current_num, args.last, args.increment)
     
    # Success!
    exit(0)
 
+########################################################################
+# The following is the script that is always run with sequ
+
 # Set up the parser
 parser = argparse.ArgumentParser(description='The sequ command prints a '
    'sequence of numbers between the "first" and the "last" argument '
    'in increments of "increment," which defaults to 1.')
-
-# We do not allow multiple simultaneous print options
 group = parser.add_mutually_exclusive_group()
-
-# Get first number. This is optional and defaults to 1
 parser.add_argument('first', 
    help='The starting integer (default=1)', type=float, nargs='?', default=1.0)
-
-# Get increment number. This is optional and defaults to 1
 parser.add_argument('increment', 
    help='The increment between numbers (default=1)', 
    type=float, nargs='?', default=1.0)
-
-# Get the last number. This number is required
 parser.add_argument('last', help='The ending integer', type=float)
-
-# Get the options. Can only specify 1.
 group.add_argument('-f', '--format', dest='string_format', 
    help='Special formatting', nargs='?')
 group.add_argument('-w', '--equal-width', dest='equalwidth',
@@ -146,11 +162,17 @@ group.add_argument('-w', '--equal-width', dest='equalwidth',
    help='Print all numbers with same width with zero padding, if necessary.')
 group.add_argument('-s', '--separator', 
    help='Print with separator instead of each number on own line', nargs='?')
+group.add_argument('-v', '--version', action='store_true',
+   help='Print the version of the sequ program')
 
 # We use a try/except in order to override the exit status code with 1
 # This code is from:
 # http://stackoverflow.com/questions/5943249/python-argparse-and-controlling-overriding-the-exit-status-code
 
+if(sys.argv[1] == '-v' or sys.argv[1] == '--version'):
+   print(get_version())
+   exit(0)
+ 
 try:
    args = parser.parse_args()
 except SystemExit:
