@@ -3,7 +3,7 @@
 # Copyright 2013 Kristina Frye
 # CS 300
 # sequ command, Compliance Level 1
-# November 2, 2013 
+# November 10, 2013 
 #
 
 # argparse allows us to easily parse the input arguments
@@ -18,7 +18,6 @@ def get_version():
 # This function determines if a loop should continue given the current number,
 # the increment, and the last number
 def continue_loop(current_num, last, increment):
-   # Create a delta for floating point weirdness 
    if(increment > 0 and current_num <= last):
       run_loop = True
    elif(increment < 0 and current_num >= last):
@@ -57,13 +56,12 @@ def get_max_precision(first, last, increment):
 # This function gets the maximum width needed by the formatted number
 # strings given a specified precision
 def get_max_length(first, last, increment, precision):
-   max_length = 0       #initialize the max lengths
-   current_num = first  #initialize the current number 
+   max_length = 0       
+   current_num = first  
    run_loop = True
 
    while(run_loop == True):
 
-      # Calculate the string lengths and precision
       length = len("{0:.{prec}f}".format(current_num, prec=precision))
 
       if(max_length < length):
@@ -101,7 +99,6 @@ def print_output(args):
    if(args.equalwidth == True):
       length = get_max_length(args.first, args.last, args.increment, precision)
 
-   # Convert to Decimal to avoid bad floating point representations
    current_num = args.first
 
    run_loop = True
@@ -124,8 +121,6 @@ def print_output(args):
          print(args.separator, end="") 
 
       # Normal printing (no options).
-      # Find the decimal precision so that we can print it correctly without
-      # rounding 
       else:
          print("{0:.{prec}f}".format(current_num, prec=precision))
 
