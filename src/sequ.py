@@ -11,7 +11,6 @@ from __future__ import print_function
 import sys
 import argparse
 from decimal import Decimal
-from decimal import getcontext 
 
 def get_version():
    return 'sequ version 1.00, written by Kristina Frye'
@@ -92,22 +91,18 @@ def check_inputs(args):
 
 # This function prints the number sequence
 def print_output(args):
-  
    # Find the greatest decimal precision needed given the first and last
    # arguments and the increment. This is needed for correct printing
-   # although we lose efficiently because it's using a loop
+   # although we lose efficiency because it's using a loop
+   # There's probably a better way to do this
    precision = get_max_precision(args.first, args.last, args.increment)
 
-   # Set the precision used by Decimal. This is to avoid floating point
-   # problems when incrementing
-   getcontext().prec = precision + 1
- 
    # Find the formatted string width, if needed
    if(args.equalwidth == True):
       length = get_max_length(args.first, args.last, args.increment, precision)
 
    # Convert to Decimal to avoid bad floating point representations
-   current_num = Decimal(args.first)
+   current_num = args.first
 
    run_loop = True
    while(run_loop == True):
@@ -135,7 +130,10 @@ def print_output(args):
          print("{0:.{prec}f}".format(current_num, prec=precision))
 
       # Increment by specified incrementer (defaults to 1)
-      current_num += Decimal(args.increment)
+      current_num += args.increment
+      
+      # round to avoid bad floating point representations
+      current_num = round(current_num, precision)
       run_loop = continue_loop(current_num, args.last, args.increment)
     
    # Success!

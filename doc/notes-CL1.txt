@@ -149,4 +149,15 @@ And sequ gives:
 
 I changed the seq output files so that the compare test will pass, but
 once the create-seq-files script is run again, that update will be
-lost.  
+lost. 
+
+November 10, 2013:
+
+Found some issues with some bad representations of floating point numbers.
+Added a magic number to the get_max_precision function so that if a
+number has a very large float representation (>= 28), then we won't use
+that precision and we will truncate the number.
+
+Also rounded current_num after it has been incremented to prevent bad
+FP representations of the result. Otherwise, the last number in the loop
+was not always displayed 
