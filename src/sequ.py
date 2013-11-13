@@ -109,9 +109,14 @@ def print_output(args):
          print("{0:0{width}.{prec}f}".format(current_num, width=length,
             prec=precision)) 
 
-      # Print with special formatting
+      # Print with special formatting. We need a try here because the
+      # format is coming directly from the user and may be incorrect
       elif args.string_format != None:
-         print(args.string_format % current_num)
+         try:
+            print(args.string_format % current_num)
+         except ValueError:
+            print("That format is not accepted.")
+            exit(1)
 
       # Print with separator. See:
       # http://stackoverflow.com/questions/255147/
@@ -149,7 +154,8 @@ parser.add_argument('increment',
    type=float, nargs='?', default=1.0)
 parser.add_argument('last', help='The ending integer', type=float)
 group.add_argument('-f', '--format', dest='string_format', 
-   help='Special formatting', nargs='?')
+   help='Print with special formatting: %%x, %%X, %%g, %%G, %%f, %%F', 
+   nargs='?')
 group.add_argument('-w', '--equal-width', dest='equalwidth',
    action='store_true', 
    help='Print all numbers with same width with zero padding, if necessary.')
