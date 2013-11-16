@@ -101,12 +101,14 @@ def print_output(args):
    precision = get_max_precision(args.first, args.last, args.increment)
 
    # Find the formatted string width, if needed
-   if(args.equalwidth == True or args.pad != None):
+   if(args.equalwidth == True or args.pad != None or args.padspaces == True):
       length = get_max_length(args.first, args.last, args.increment, precision)
       if(args.pad != None):
          pad = str(args.pad)
-      else:
+      elif(args.equalwidth == True):
          pad = '0'
+      elif(args.padspaces == True):
+         pad = ' '
       pad += '>'
    current_num = args.first
 
@@ -114,7 +116,7 @@ def print_output(args):
    while(run_loop == True):
 
       # Print with specified width and precision (equal-width)
-      if(args.equalwidth == True or args.pad != None):
+      if(args.equalwidth == True or args.pad != None or args.padspaces == True):
          print("{0:{fill}{width}.{prec}f}".format(current_num, fill=pad,
             width=length, prec=precision)) 
 
@@ -174,10 +176,8 @@ group.add_argument('-v', '--version', action='store_true',
    help='Print the version of the sequ program')
 group.add_argument('-p', '--pad', 
    help='Pad to the left with the specified character', nargs='?')
-
-# We use a try/except in order to override the exit status code with 1
-# This code is from:
-# http://stackoverflow.com/questions/5943249/python-argparse-and-controlling-overriding-the-exit-status-code
+group.add_argument('-P', '--pad-spaces', dest='padspaces', action='store_true',
+   help='Pad to the left with spaces')
 
 if(sys.argv[1] == '-v' or sys.argv[1] == '--version'):
    print(get_version())
