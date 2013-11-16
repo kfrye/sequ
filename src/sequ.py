@@ -100,7 +100,7 @@ def print_output(args):
    # There's probably a better way to do this
    precision = get_max_precision(args.first, args.last, args.increment)
 
-   # Find the formatted string width, if needed
+   # Find the formatted string width for -w, -p, or -P
    if(args.equalwidth == True or args.pad != None or args.padspaces == True):
       length = get_max_length(args.first, args.last, args.increment, precision)
       if(args.pad != None):
@@ -109,16 +109,17 @@ def print_output(args):
          pad = '0'
       elif(args.padspaces == True):
          pad = ' '
+      # The following alignment char '>' is needed for specifying the pad char
       pad += '>'
-  
+   
+   # Find a specified separator for -s or -W 
    if(args.separator != None or args.words == True):
       if(args.separator != None):
          sep = args.separator
       else:
          sep = ' '
- 
+    
    current_num = args.first
-
    run_loop = True
    while(run_loop == True):
 

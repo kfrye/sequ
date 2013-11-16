@@ -53,4 +53,7 @@ Main categories of printing:
 I might need to break up print_output into smaller functions, but I will get the
 new features working first and then look into re-factoring
 
- 
+Followup: I implemented the new features and it added about 10 lines of code to
+my print_output function. I could separate this out into separate functions, but
+I don't have any duplicate code and separating stuff out probably won't help me
+with simplifying anything, so I'm going to leave it as is. 
