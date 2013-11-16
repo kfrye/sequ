@@ -110,6 +110,13 @@ def print_output(args):
       elif(args.padspaces == True):
          pad = ' '
       pad += '>'
+  
+   if(args.separator != None or args.words == True):
+      if(args.separator != None):
+         sep = args.separator
+      else:
+         sep = ' '
+ 
    current_num = args.first
 
    run_loop = True
@@ -132,9 +139,9 @@ def print_output(args):
       # Print with separator. See:
       # http://stackoverflow.com/questions/255147/
       #   how-do-i-keep-python-print-from-adding-spaces
-      elif args.separator != None:
+      elif args.separator != None or args.words == True:
          print("{0:g}".format(current_num), end='')
-         print(args.separator, end="") 
+         print(sep, end="") 
 
       # Normal printing (no options).
       else:
@@ -178,6 +185,8 @@ group.add_argument('-p', '--pad',
    help='Pad to the left with the specified character', nargs='?')
 group.add_argument('-P', '--pad-spaces', dest='padspaces', action='store_true',
    help='Pad to the left with spaces')
+group.add_argument('-W', '--words', action='store_true', 
+   help='Separate output with space instead of new line')
 
 if(sys.argv[1] == '-v' or sys.argv[1] == '--version'):
    print(get_version())
