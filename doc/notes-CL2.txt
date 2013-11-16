@@ -1,0 +1,56 @@
+Kristina Frye
+CS 300
+November 16, 2013
+CL2 Notes
+
+Specs for CL2:
+
+Compliance Level 2 of sequ adds additional convenience arguments for formatting.
+
+The arguments that MUST be accepted are as follows:
+
+-W, --words: Output the sequence as a single space-separated line. Equivalent to
+"-s ' '".
+
+-p, --pad : Output the sequence with elements padded on the left to be all of
+equal width: the pad character is given by the single-char pad string .
+Backslash-escapes in MUST be processed as in C printf(3).
+
+Note that the "-w" command of level 2 is equivalent to "-p '0'".
+
+-P, --pad-spaces: Output the sequence with elements padded with spaces on the
+left to be all of equal width. Equivalent to "-p ' '".
+
+---
+-W is very similar to -s. I should be able to leverage existing code, although I
+will probably need to put this functionality into a separate function or 
+refactor entirely.
+
+-p and -P are very similar to -w. Likewise, I should be able to leverage
+existing code, but will need to refactor.
+
+------
+
+Main categories of printing:
+
+-Equal-width (Must specify width and precision)
+
+   -w: Pad to left and right with zeros.
+   -p: Pad to left with specified symbol. Pad to right with zeros.
+   -P: Pad to left with spaces. Pad to right with zeros.
+
+-Separator (Must specify end character)
+
+   -s: Separate with specified character
+   -W: Separate with space
+
+-Special formatting (Must print with user-specified format)
+
+   -f: Use specified formatting
+
+-Normal printing (Print with precision determined by get_max_precision)
+
+I might need to break up print_output into smaller functions, but I will get the
+new features working first and then look into re-factoring
+
+ 

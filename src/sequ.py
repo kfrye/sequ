@@ -2,8 +2,8 @@
 
 # Copyright 2013 Kristina Frye
 # CS 300
-# sequ command, Compliance Level 1
-# November 10, 2013 
+# sequ command, Compliance Level 2
+# November 16, 2013 
 #
 
 # argparse allows us to easily parse the input arguments
@@ -13,7 +13,7 @@ import argparse
 from decimal import Decimal
 
 def get_version():
-   return 'sequ version 1.00, written by Kristina Frye'
+   return 'sequ version 1.10, written by Kristina Frye'
 
 # This function determines if a loop should continue given the current number,
 # the increment, and the last number
@@ -87,6 +87,11 @@ def check_inputs(args):
       print("The range between first and last must be less than 100000000.")
       exit(1) 
 
+   if(args.pad != None):
+      if(len(args.pad) != 1):
+         print("You need to specify a one character padding.")
+         exit(1)
+
 # This function prints the number sequence
 def print_output(args):
    # Find the greatest decimal precision needed given the first and last
@@ -96,18 +101,22 @@ def print_output(args):
    precision = get_max_precision(args.first, args.last, args.increment)
 
    # Find the formatted string width, if needed
-   if(args.equalwidth == True):
+   if(args.equalwidth == True or args.pad != None):
       length = get_max_length(args.first, args.last, args.increment, precision)
-
+      if(args.pad != None):
+         pad = str(args.pad)
+      else:
+         pad = '0'
+      pad += '>'
    current_num = args.first
 
    run_loop = True
    while(run_loop == True):
 
       # Print with specified width and precision (equal-width)
-      if args.equalwidth == True:
-         print("{0:0{width}.{prec}f}".format(current_num, width=length,
-            prec=precision)) 
+      if(args.equalwidth == True or args.pad != None):
+         print("{0:{fill}{width}.{prec}f}".format(current_num, fill=pad,
+            width=length, prec=precision)) 
 
       # Print with special formatting. We need a try here because the
       # format is coming directly from the user and may be incorrect
@@ -163,6 +172,8 @@ group.add_argument('-s', '--separator',
    help='Print with separator instead of each number on own line', nargs='?')
 group.add_argument('-v', '--version', action='store_true',
    help='Print the version of the sequ program')
+group.add_argument('-p', '--pad', 
+   help='Pad to the left with the specified character', nargs='?')
 
 # We use a try/except in order to override the exit status code with 1
 # This code is from:

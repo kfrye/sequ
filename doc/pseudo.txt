@@ -1,6 +1,9 @@
 Kristina Frye
 CS 300
-November 2, 2013
+November 16, 2013
+
+CL2
+
 
 sequ - Compliance Level 1
 
