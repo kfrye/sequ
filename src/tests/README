@@ -5,8 +5,8 @@ In the src/tests directory:
       generates files automatically named from the arguments.
 
    -  create-seq-files.sh. To be used as: 
-      ./create-seq-files seq < test-list 
-      ./create-seq-files ./sequ.py < test-list
+      ./create-seq-files.sh seq < test-list 
+      ./create-seq-files.sh ./sequ.py < test-list
       This generates files from seq and sequ.py, taking the arguments from
       test-list
 

@@ -87,3 +87,12 @@ Test 1 1 4.2: passed
 Test 4: passed
 Test 1 4: passed
 Test 1 1 4: passed
+Test -W 1 5: passed
+Test -W -1 2: passed
+Test -W 1 2 3: passed
+Test -p # -1 1: passed
+Test -p ? 1 50 101: passed
+Test -p ? 1 4.05 14: passed
+Test -P 1 50 101: passed
+Test -P -1 1: passed
+Test -P 1 4.05 14: passed
