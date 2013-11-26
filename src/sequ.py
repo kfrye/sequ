@@ -86,7 +86,9 @@ def check_inputs(args):
    if(abs(args.last - args.first) > 100000000):
       print("The range between first and last must be less than 100000000.")
       exit(1) 
-
+   
+   # limit pad characters, but allow backslash escapes by checking for
+   # two character pad in which the first character is '\'
    if(args.pad != None):
       if((len(args.pad) == 2 and args.pad[0] != '\\') and len(args.pad) != 1):
          print("You need to specify a one character padding.")
