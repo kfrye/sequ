@@ -140,9 +140,11 @@ def print_output(args):
       # Print with separator. See:
       # http://stackoverflow.com/questions/255147/
       #   how-do-i-keep-python-print-from-adding-spaces
+      # Print while evaluating backslash escapes:
+      # http://stackoverflow.com/questions/4020539/process-escape-sequences-in-a-string-in-python
       elif args.separator != None or args.words == True:
          print("{0:g}".format(current_num), end='')
-         print(sep, end="") 
+         print(sep.decode('string_escape'), end="") 
 
       # Normal printing (no options).
       else:
