@@ -67,3 +67,12 @@ created automatically and compared against my manually created "seq" files. This
 is a bit more of a pain since I can't generate my golden standard automatically,
 but there's no choice since seq doesn't actually have the options specified in
 CL2. 
+
+---
+November 25, 2013
+
+Updated code to evalute backslash escapes as noted in the graded CL1 homework.
+I hadn't understood that requirement of the assignment. Still not sure how
+it is supposed to work, but I'm evaluating a backslash escape as if it is a 
+single character. Since this behavior was not specified in the spec, I will
+assume that this will be okay
