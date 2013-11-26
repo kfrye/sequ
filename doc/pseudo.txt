@@ -2,9 +2,26 @@ Kristina Frye
 CS 300
 November 16, 2013
 
-CL2
+CL2: Print formatted strings of equal width
 
+if args.equal-width = true or args.pad = true or args.padspaces = true then
+   length = get_max_length
+   
+   if(args.pad = true) 
+      pad = args.pad_character
+   else if args.equal-width = true then
+      pad = '0'
+   else if args.padspaces = true then
+      pad = ' '
+   print with pad
 
+if args.separator = true or args.words = true then
+   if args.separator = true then
+      sep = separator_char
+   else
+      sep = ' '
+   print with separator
+ 
 sequ - Compliance Level 1
 
 Parse the arguments from the command line:
