@@ -88,7 +88,7 @@ def check_inputs(args):
       exit(1) 
 
    if(args.pad != None):
-      if(len(args.pad) != 1):
+      if((len(args.pad) == 2 and args.pad[0] != '\\') and len(args.pad) != 1):
          print("You need to specify a one character padding.")
          exit(1)
 
@@ -125,7 +125,8 @@ def print_output(args):
 
       # Print with specified width and precision (equal-width)
       if(args.equalwidth == True or args.pad != None or args.padspaces == True):
-         print("{0:{fill}{width}.{prec}f}".format(current_num, fill=pad,
+         print("{0:{fill}{width}.{prec}f}".format(current_num,
+            fill=pad.decode('string_escape'),
             width=length, prec=precision)) 
 
       # Print with special formatting. We need a try here because the
