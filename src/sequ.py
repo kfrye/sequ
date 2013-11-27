@@ -80,13 +80,14 @@ def get_max_length_roman(first, last, increment):
    run_loop = True
 
    while(run_loop == True):
+      roman_str = roman.toRoman(current_num)
       length = len(roman.toRoman(current_num))
 
-   if(max_length < length):
-      max_length = length
+      if(max_length < length):
+         max_length = length
 
-   current_num += increment
-   run_loop = continue_loop(current_num, last, incremnt)
+      current_num += int(increment)
+      run_loop = continue_loop(current_num, last, increment)
 
    return max_length
 
@@ -171,6 +172,15 @@ class SequValue:
    def increment(self):
       self.num += 1
 
+
+def getRomanString(num, input_type):
+   roman_str = roman.toRoman(int(num))
+   if(input_type == 'R'):
+      return roman_str 
+   else:
+      return roman_str.lower()
+      
+
 def setDefaults(value_type):
    if(value_type == 'r'): 
       default = SequValue('i') 
@@ -192,7 +202,6 @@ def check_inputs(args):
       print('The "last" value is not valid')
       exit(1)
 
-   print("last value type: ", last.value_type)
    if(args.first != None):
       first = SequValue(args.first)
    else:
@@ -203,9 +212,9 @@ def check_inputs(args):
    else:
       increment = SequValue("1") 
 
-   print("last: ", args.last, last.num)
-   print("first: ", args.first, first.num)
-   print("increment: ", args.increment, increment.num)
+#  print("last: ", args.last, last.num)
+#  print("first: ", args.first, first.num)
+#  print("increment: ", args.increment, increment.num)
 
    # Exit with success if nothing to print
    if(first.num > last.num):
@@ -250,7 +259,6 @@ def print_output(args, inputs):
          length = get_max_length(first.num, last.num, increment.num, precision)
       elif(last.value_type == 'r' or last.value_type == 'R'):
          length = get_max_length_roman(first.num, last.num, increment.num)
-
       if(args.pad != None):
          pad = str(args.pad)
       elif(args.equalwidth == True):
@@ -274,15 +282,16 @@ def print_output(args, inputs):
    run_loop = True
    while(run_loop == True):
 
+      value_type = last.value_type
       # Print with specified width and precision (equal-width)
       if(args.equalwidth == True or args.pad != None or args.padspaces == True):
-         if(last.value_type == 'f' or last.value_type == 'i'):
+         if(value_type == 'f' or value_type == 'i'):
             print("{0:{fill}{width}.{prec}f}".format(current_num,
                fill=pad.decode('string_escape'),
                width=length, prec=precision)) 
-         elif(last.value_type == 'R' or last.value_type == 'r'):
-            print("{0:{fill}{width}}".format(roman.toRoman(int(current_num)),
-               fill=pad, width=length))
+         elif(value_type == 'R' or value_type == 'r'):
+            print("{0:{fill}{width}}".format(getRomanString(current_num,
+               value_type), fill=pad, width=length))
          else:
             print(chr(current_num))
       # Print with special formatting. We need a try here because the
@@ -300,20 +309,20 @@ def print_output(args, inputs):
       # Print while evaluating backslash escapes:
       # http://stackoverflow.com/questions/4020539/process-escape-sequences-in-a-string-in-python
       elif args.separator != None or args.words == True:
-         if(last.value_type == 'f' or last.value_type == 'i'):
+         if(value_type == 'f' or value_type == 'i'):
             print("{0:g}".format(current_num), end='')
-         elif(last.value_type == 'R' or last.value_type == 'r'):
-            print(roman.toRoman(int(current_num)))
+         elif(value_type == 'R' or value_type == 'r'):
+            print(getRomanString(current_num, value_type))
          else:
             print(chr(int(current_num)))
          print(sep.decode('string_escape'), end="") 
 
       # Normal printing (no options).
       else:
-         if(last.value_type == 'f' or last.value_type == 'i'):
+         if(value_type == 'f' or value_type == 'i'):
             print("{0:.{prec}f}".format(current_num, prec=precision))
-         elif(last.value_type == 'R' or last.value_type == 'r'):
-            print(roman.toRoman(int(current_num)))
+         elif(value_type == 'R' or value_type == 'r'):
+            print(getRomanString(current_num, value_type))
          else:
             print(chr(int(current_num)))
 
