@@ -11,9 +11,11 @@ from __future__ import print_function
 import sys
 import argparse
 from decimal import Decimal
+import roman
+import re
 
 def get_version():
-   return 'sequ version 1.10, written by Kristina Frye'
+   return 'sequ version 1.20, written by Kristina Frye'
 
 # This function determines if a loop should continue given the current number,
 # the increment, and the last number
@@ -72,18 +74,149 @@ def get_max_length(first, last, increment, precision):
  
    return max_length
 
+def get_max_length_roman(first, last, increment):
+   max_length = 0
+   current_num = int(first)
+   run_loop = True
+
+   while(run_loop == True):
+      length = len(roman.toRoman(current_num))
+
+   if(max_length < length):
+      max_length = length
+
+   current_num += increment
+   run_loop = continue_loop(current_num, last, incremnt)
+
+   return max_length
+
+def isRoman(num):
+   if roman.romanNumeralPattern.search(num):
+      return True
+   else:
+      return False
+
+# Found easy way to check if a string is alpha: 
+# http://stackoverflow.com/questions/9072844/how-can-i-check-if-a-string-contains-any-letters-from-the-alphabet
+
+def isUpperAlpha(input_string):
+   if(re.search('[a-z]', input_string)):
+      return True
+   else:
+      return False
+
+def isLowerAlpha(input_string):
+   if(re.search('[A-Z]', input_string)):
+      return True
+   else:
+      return False
+
+# How to determine string is a number:
+# http://stackoverflow.com/questions/354038/how-do-i-check-if-a-string-is-a-number-in-python 
+def isFloat(input_string):
+   try:
+      float(input_string)
+      return True
+   except ValueError:
+      return False
+
+def isInteger(input_string):
+   if(isFloat(input_string)):
+      if(float(input_string).is_integer()):
+         return True
+   return False
+
+# Takes a string and returns 'R' for upper case roman, 'r' for lower case
+# roman, 'A' for upper case alpha, 'a' for lower case alpha, 'i' for integer, 
+# 'f' for float, and '0' for none of the above
+def getType(s):
+   if(s.isupper()):
+      if(isRoman(s)):
+         return 'R'
+      else:
+         if(len(s) == 1):
+            return 'A'
+   elif(s.islower()):
+      if(isRoman(s.upper())):
+         return 'r'
+      else:
+         if(len(s) == 1):
+            return 'a'
+   elif(isInteger(s)):
+      return 'i'
+   elif(isFloat(s)):
+      return 'f' 
+   else:
+      return '0'
+
+def convertToNum(s):
+   input_type = getType(s)
+   if(input_type == 'R'):
+      num = roman.fromRoman(s)
+   elif(input_type == 'r'):
+      num = roman.fromRoman(s.upper())
+   elif(input_type == 'a' or input_type == 'A'):
+      num = ord(s)
+   elif(input_type == 'i' or input_type == 'f'):
+      num = float(s)
+   else:
+      num = 0
+   return num
+ 
+class SequValue:
+   def __init__(self, s):
+      self.input_string = s
+      self.value_type = getType(s)
+      self.num = convertToNum(s)
+   def increment(self):
+      self.num += 1
+
+def setDefaults(value_type):
+   if(value_type == 'r'): 
+      default = SequValue('i') 
+   elif(value_type == 'R'): 
+      default = SequValue('I') 
+   elif(value_type == 'i' or value_type == 'f'):
+      default = SequValue('1')
+   elif(value_type == 'a'): 
+      default = SequValue('a')
+   elif(value_type == 'A'):
+      default = SequValue('A')
+   return default
+       
 # This function runs a few checks of the input for validity
 def check_inputs(args):
+   last = SequValue(args.last)
+
+   if(last.value_type == '0'):
+      print('The "last" value is not valid')
+      exit(1)
+
+   print("last value type: ", last.value_type)
+   if(args.first != None):
+      first = SequValue(args.first)
+   else:
+      first = setDefaults(last.value_type)
+
+   if(args.increment != None):
+      increment = SequValue(args.increment)
+   else:
+      increment = SequValue("1") 
+
+   print("last: ", args.last, last.num)
+   print("first: ", args.first, first.num)
+   print("increment: ", args.increment, increment.num)
+
    # Exit with success if nothing to print
-   if(args.first > args.last):
-      if(args.increment > 0):
+   if(first.num > last.num):
+      if(increment.num > 0):
          exit(0) 
    else:
-      if(args.increment < 0):
+      if(increment.num < 0):
          exit(0)
 
    # Limit the range so my computer doesn't run out of memory
-   if(abs(args.last - args.first) > 100000000):
+   if(abs(last.num - first.num) > 100000000):
       print("The range between first and last must be less than 100000000.")
       exit(1) 
    
@@ -94,26 +227,42 @@ def check_inputs(args):
          print("You need to specify a one character padding.")
          exit(1)
 
+   return first, last, increment
+
 # This function prints the number sequence
-def print_output(args):
+def print_output(args, inputs):
+   first = inputs[0]
+   last = inputs[1]
+   increment = inputs[2]
+
    # Find the greatest decimal precision needed given the first and last
    # arguments and the increment. This is needed for correct printing
    # although we lose efficiency because it's using a loop
    # There's probably a better way to do this
-   precision = get_max_precision(args.first, args.last, args.increment)
-
+   if(last.value_type == 'f' or last.value_type == 'i'):
+      precision = get_max_precision(first.num, last.num, increment.num)
+   else:
+      precision = 1
+ 
    # Find the formatted string width for -w, -p, or -P
    if(args.equalwidth == True or args.pad != None or args.padspaces == True):
-      length = get_max_length(args.first, args.last, args.increment, precision)
+      if(last.value_type == 'f' or last.value_type == 'i'):   
+         length = get_max_length(first.num, last.num, increment.num, precision)
+      elif(last.value_type == 'r' or last.value_type == 'R'):
+         length = get_max_length_roman(first.num, last.num, increment.num)
+
       if(args.pad != None):
          pad = str(args.pad)
       elif(args.equalwidth == True):
-         pad = '0'
+         if(last.value_type == 'f' or last.value_type == 'i'):
+            pad = '0'
+         elif(last.value_type == 'r' or last.value_type == 'R'):
+            pad = ' '
       elif(args.padspaces == True):
          pad = ' '
       # The following alignment char '>' is needed for specifying the pad char
       pad += '>'
-   
+ 
    # Find a specified separator for -s or -W 
    if(args.separator != None or args.words == True):
       if(args.separator != None):
@@ -121,16 +270,21 @@ def print_output(args):
       else:
          sep = ' '
     
-   current_num = args.first
+   current_num = first.num
    run_loop = True
    while(run_loop == True):
 
       # Print with specified width and precision (equal-width)
       if(args.equalwidth == True or args.pad != None or args.padspaces == True):
-         print("{0:{fill}{width}.{prec}f}".format(current_num,
-            fill=pad.decode('string_escape'),
-            width=length, prec=precision)) 
-
+         if(last.value_type == 'f' or last.value_type == 'i'):
+            print("{0:{fill}{width}.{prec}f}".format(current_num,
+               fill=pad.decode('string_escape'),
+               width=length, prec=precision)) 
+         elif(last.value_type == 'R' or last.value_type == 'r'):
+            print("{0:{fill}{width}}".format(roman.toRoman(int(current_num)),
+               fill=pad, width=length))
+         else:
+            print(chr(current_num))
       # Print with special formatting. We need a try here because the
       # format is coming directly from the user and may be incorrect
       elif args.string_format != None:
@@ -146,19 +300,29 @@ def print_output(args):
       # Print while evaluating backslash escapes:
       # http://stackoverflow.com/questions/4020539/process-escape-sequences-in-a-string-in-python
       elif args.separator != None or args.words == True:
-         print("{0:g}".format(current_num), end='')
+         if(last.value_type == 'f' or last.value_type == 'i'):
+            print("{0:g}".format(current_num), end='')
+         elif(last.value_type == 'R' or last.value_type == 'r'):
+            print(roman.toRoman(int(current_num)))
+         else:
+            print(chr(int(current_num)))
          print(sep.decode('string_escape'), end="") 
 
       # Normal printing (no options).
       else:
-         print("{0:.{prec}f}".format(current_num, prec=precision))
+         if(last.value_type == 'f' or last.value_type == 'i'):
+            print("{0:.{prec}f}".format(current_num, prec=precision))
+         elif(last.value_type == 'R' or last.value_type == 'r'):
+            print(roman.toRoman(int(current_num)))
+         else:
+            print(chr(int(current_num)))
 
       # Increment by specified incrementer (defaults to 1)
-      current_num += args.increment
+      current_num += increment.num
       
       # round to avoid bad floating point representations
       current_num = round(current_num, precision)
-      run_loop = continue_loop(current_num, args.last, args.increment)
+      run_loop = continue_loop(current_num, last.num, increment.num)
     
    # Success!
    exit(0)
@@ -172,11 +336,10 @@ parser = argparse.ArgumentParser(description='The sequ command prints a '
    'in increments of "increment," which defaults to 1.')
 group = parser.add_mutually_exclusive_group()
 parser.add_argument('first', 
-   help='The starting integer (default=1)', type=float, nargs='?', default=1.0)
+   help='The starting integer (default=1)', nargs='?')
 parser.add_argument('increment', 
-   help='The increment between numbers (default=1)', 
-   type=float, nargs='?', default=1.0)
-parser.add_argument('last', help='The ending integer', type=float)
+   help='The increment between numbers (default=1)', nargs='?')
+parser.add_argument('last', help='The ending integer')
 group.add_argument('-f', '--format', dest='string_format', 
    help='Print with special formatting: %%x, %%X, %%g, %%G, %%f, %%F', 
    nargs='?')
@@ -203,5 +366,5 @@ try:
 except SystemExit:
    exit(1)
 
-check_inputs(args)
-print_output(args)
+inputs = check_inputs(args)
+print_output(args, inputs)
