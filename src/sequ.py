@@ -12,7 +12,6 @@ import sys
 import argparse
 from decimal import Decimal
 import roman
-import re
 
 def get_version():
    return 'sequ version 1.20, written by Kristina Frye'
@@ -74,6 +73,8 @@ def get_max_length(first, last, increment, precision):
  
    return max_length
 
+# This function gets the maximum width needed by a sequence of roman
+# numbers
 def get_max_length_roman(first, last, increment):
    max_length = 0
    current_num = int(first)
@@ -93,21 +94,6 @@ def get_max_length_roman(first, last, increment):
 
 def isRoman(num):
    if roman.romanNumeralPattern.search(num):
-      return True
-   else:
-      return False
-
-# Found easy way to check if a string is alpha: 
-# http://stackoverflow.com/questions/9072844/how-can-i-check-if-a-string-contains-any-letters-from-the-alphabet
-
-def isUpperAlpha(input_string):
-   if(re.search('[a-z]', input_string)):
-      return True
-   else:
-      return False
-
-def isLowerAlpha(input_string):
-   if(re.search('[A-Z]', input_string)):
       return True
    else:
       return False
@@ -150,6 +136,7 @@ def getType(s):
    else:
       return '0'
 
+# Converts a string to a number based upon the input type of the string
 def convertToNum(s):
    input_type = getType(s)
    if(input_type == 'R'):
@@ -163,24 +150,45 @@ def convertToNum(s):
    else:
       num = 0
    return num
- 
+
+# Class used to store the type and numeric value of a number 
 class SequValue:
    def __init__(self, s):
-      self.input_string = s
       self.value_type = getType(s)
       self.num = convertToNum(s)
-   def increment(self):
-      self.num += 1
 
-
+# Returns a roman numeral string based upon a number and the type 
+# (lower case vs upper case roman)
 def getRomanString(num, input_type):
    roman_str = roman.toRoman(int(num))
    if(input_type == 'R'):
       return roman_str 
    else:
       return roman_str.lower()
-      
 
+def getLetter(num, repeat):
+   if(repeat == True):
+      num -= 1
+
+   if(num <= 25):
+      letter = chr(num + ord('a'))
+      return letter
+
+   return_string = getLetter(int(num / 26), True)
+   return_string += chr((num % 26) + ord('a'))
+   return return_string
+
+def getCharString(num, input_type):
+   if(input_type == 'A'):
+      num = ord(chr(num).lower())
+   num -= ord('a')
+   char_string = getLetter(num, False)
+   if(input_type == 'A'):
+      char_string = char_string.upper()
+   return char_string
+ 
+# Returns a SequValue object with defaults appropriate for a beginning
+# value for the type. For instance, type 'A' should begin with a capital 'A'
 def setDefaults(value_type):
    if(value_type == 'r'): 
       default = SequValue('i') 
@@ -211,10 +219,6 @@ def check_inputs(args):
       increment = SequValue(args.increment)
    else:
       increment = SequValue("1") 
-
-#  print("last: ", args.last, last.num)
-#  print("first: ", args.first, first.num)
-#  print("increment: ", args.increment, increment.num)
 
    # Exit with success if nothing to print
    if(first.num > last.num):
@@ -324,7 +328,7 @@ def print_output(args, inputs):
          elif(value_type == 'R' or value_type == 'r'):
             print(getRomanString(current_num, value_type))
          else:
-            print(chr(int(current_num)))
+            print(getCharString(int(current_num), value_type))
 
       # Increment by specified incrementer (defaults to 1)
       current_num += increment.num
