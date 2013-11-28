@@ -121,20 +121,43 @@ def getType(s):
       if(isRoman(s)):
          return 'R'
       else:
-         if(len(s) == 1):
-            return 'A'
+         return 'A'
    elif(s.islower()):
       if(isRoman(s.upper())):
          return 'r'
       else:
-         if(len(s) == 1):
-            return 'a'
+         return 'a'
    elif(isInteger(s)):
       return 'i'
    elif(isFloat(s)):
       return 'f' 
    else:
       return '0'
+
+# Converts a character string into a numeric string 
+def fromCharString(s):
+   length = len(s)
+   num = ord('a') - 1
+   
+   for i in range(length - 1, -1, -1):
+      if(i == length - 1):
+         num += ord(s[i]) - ord('a') + 1
+      else:
+         letter = ord(s[i]) - ord('a') + 1
+         letter = letter * 26**(length - i - 1)
+         num += letter
+
+   return num
+
+# Converts a numeric string into a character string
+def getCharString(num, input_type):
+   if(input_type == 'A'):
+      num = ord(chr(num).lower())
+   num -= ord('a')
+   char_string = getLetter(num, False)
+   if(input_type == 'A'):
+      char_string = char_string.upper()
+   return char_string
 
 # Converts a string to a number based upon the input type of the string
 def convertToNum(s):
@@ -144,7 +167,7 @@ def convertToNum(s):
    elif(input_type == 'r'):
       num = roman.fromRoman(s.upper())
    elif(input_type == 'a' or input_type == 'A'):
-      num = ord(s)
+      num = fromCharString(s.lower()) 
    elif(input_type == 'i' or input_type == 'f'):
       num = float(s)
    else:
@@ -166,6 +189,8 @@ def getRomanString(num, input_type):
    else:
       return roman_str.lower()
 
+# Recursive function used to get a character sequence from a number.
+# Repeat is set to false when called outside of the function
 def getLetter(num, repeat):
    if(repeat == True):
       num -= 1
@@ -178,15 +203,8 @@ def getLetter(num, repeat):
    return_string += chr((num % 26) + ord('a'))
    return return_string
 
-def getCharString(num, input_type):
-   if(input_type == 'A'):
-      num = ord(chr(num).lower())
-   num -= ord('a')
-   char_string = getLetter(num, False)
-   if(input_type == 'A'):
-      char_string = char_string.upper()
-   return char_string
- 
+
+
 # Returns a SequValue object with defaults appropriate for a beginning
 # value for the type. For instance, type 'A' should begin with a capital 'A'
 def setDefaults(value_type):
@@ -205,13 +223,15 @@ def setDefaults(value_type):
 # This function runs a few checks of the input for validity
 def check_inputs(args):
    last = SequValue(args.last)
-
+   print("Last type: ", last.value_type)
+   print("Last: ", last.num)
    if(last.value_type == '0'):
       print('The "last" value is not valid')
       exit(1)
 
    if(args.first != None):
       first = SequValue(args.first)
+      print("First: ", first.num)
    else:
       first = setDefaults(last.value_type)
 
