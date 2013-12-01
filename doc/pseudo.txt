@@ -1,7 +1,169 @@
 Kristina Frye
 CS 300
-November 16, 2013
+November 30, 2013
 
+CL3: Print with alpha, roman, and int formatting
+
+Turn an ascii number into an alpha:
+
+Input: num = num - ascii('a'). We subtract the ascii representation of 'a' from
+the ascii representation of the desired character so that we are dealing with
+a repeating pattern of 26 letters. We convert back to ascii by adding ascii('a')
+when needed.
+
+string getLetter(num, repeat)
+   if(repeat == True)
+      num = num - 1
+   
+   if(num <= total_letters_in_alphabet - 1 (25) 
+      return character(num + ascii('a'))
+  
+   return_string = getLetter(num / 26, True)
+   return_string += character((num % 26) + ascii('a'))
+   return return_string  
+   
+Example: Since 122 = "z", "aa" should be 123.
+123 - ascii('a') = 123 - 97 = 123-97 = 26
+repeat = False, 26 > 25, so return_string = getLetter(26/26, True)
+num = 1 - 1 = 0
+0 < 25, so return character(0 + ascii('a')) = ascii('a')
+return_string = 'a' + character(26 % 26 + ascii('a')) = 'a' + 'a' = "aa"
+
+The algorithm is a little funky because the conversion between numeric to alpha
+is not straigh modular arithmetic. 'a' can only be thought of as 0 in the 1s
+place because aa is different than a.
+
+---
+This function transforms a character string ('aaa') into a number for easier
+storage and manipulation. 
+
+int fromCharString(char_string)
+   length = length of char_string
+   num = ascii('a') - 1
+  
+   for i from length - 1 to 0 in -1 increments
+      letter = ascii(char_string) - ascii('a') + 1
+      letter = letter * 26^(length - i - 1)
+      num += letter
+   return num
+ 
+--
+Check format words: This is used when a format_word is specified.
+It sets the format, if needed, and checks that the other specified
+arguments agree with it.
+
+parseFormatWord(first, last, increment)
+
+isParsed = True 
+
+if format_word = roman or format_word = ROMAN
+   if (isUpperRoman(last) = True and format_word = ROMAN) or
+      (last.type = arabic and format_word = ROMAN)
+      type = 'ROMAN'
+      isParsed = True
+   else if (isLowerRoman(last) and format_word = roman) or
+      (last.type = arabic and format_word = roman)
+      type = 'roman'
+      isParsed = True
+   else 
+      isParsed = False 
+ 
+   if first != None and first.type != arabic
+      if (type = roman and isLowerRoman(first) = False) or
+         (type = ROMAN and isUpperRoman(first) = False) 
+         isParsed = False 
+
+   if increment != None and increment.type != arabic
+      if (type = roman and isLowerRoman(increment) = False) or
+         (type = ROMAN and isUpperRoman(increment) = False)
+         isParsed = False
+
+if format_word = 'alpha' or format_word = 'ALPHA'
+   if isUpperAlpha(last) and format_word = 'ALPHA'
+      type = 'ALPHA'
+      isParsed = True
+   else if isLowerAlpha(last) and format_word = 'alpha'
+      type = 'alpha'
+      isParsed = True
+   else 
+      isParsed = False
+ 
+   if first != None
+      if (last.type = alpha and isLowerAlpha(first) = False) or
+         (last.type = ALPHA and isUpperAlpha(first) = False) 
+         isParsed = False
+
+   if increment != None
+      if increment.type != arabic
+         isParsed = False
+
+if format_word = 'arabic'
+   if last.type != 'arabic' 
+      isParsed = False
+   else
+      type = 'arabic'
+
+   if first != None and first.type != arabic
+      isParsed = False
+
+   if increment != None and increment.type != arabic
+      isParsed = False
+
+if format_word = 'floating'
+   if isFloat(last)
+      type = 'floating"
+      isParsed = True
+   else
+      isParsed = False
+
+   if first != None and isFloat(first) != True
+      isParsed = False
+
+   if increment != None and IsFloat(increment) != True
+      isParsed = False
+
+return isParsed, type
+
+Argument parsing: This parsing is done whether or not a format-word is specified
+
+if last.type = alpha or last.type = ALPHA
+   if first != None 
+      if last.type = ALPHA and isUpperAlpha(first) != True or
+         last.type = alpha and isLowerAlpha(first) != True 
+            print "The 'first' and 'last' arguments must be of the same type"
+            exit(1)
+   if increment != None
+      if increment.type != arabic
+         print "Character arguments must use an arabic (integer) increment"
+         exit(1)
+
+else if last.type = arabic
+   if first != None
+      if first.type != arabic and first.type != floating 
+         print "The 'first' and 'last' arguments must be of the same type"
+         exit(1)
+   if increment != None
+      if increment.type != arabic and increment.type != first.type
+         print "The 'first' and 'increment' arguments must be of the same type"
+         exit(1)
+
+else if last.type = floating
+   if first != None
+      if first.type != arabic and first.type != last.type
+         print "The 'first' and 'last' arguments must be of the same type"
+         exit(1)
+   if increment != None
+      if increment.type != arabic and increment.type != last.type
+         print "The 'increment' and 'last' arguments must be of the same type"
+         exit(1)
+
+else if last.type = roman or last.type = ROMAN
+   if last.num > 4999 or (first != None and first.num > 4999) or
+      (increment != None and increment.num > 4999)
+      print "Roman numbers may only be used up to 4999."
+      exit(1)
+
+   
 CL2: Print formatted strings of equal width
 
 if args.equal-width = true or args.pad = true or args.padspaces = true then
