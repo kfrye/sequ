@@ -499,7 +499,7 @@ def print_output(args, inputs):
       pad += '>'
  
    # Find a specified separator for -s or -W 
-   if(args.separator != None or args.words == True):
+   if(args.separator != None or args.words == True or args.nlines == True):
       if(args.separator != None):
          sep = args.separator
       else:
@@ -513,51 +513,47 @@ def print_output(args, inputs):
       # Print with specified width and precision (equal-width)
       if(args.equalwidth == True or args.pad != None or args.padspaces == True):
          if(value_type == 'f' or value_type == 'i'):
-            print("{0:{fill}{width}.{prec}f}".format(current_num,
+            output_string = "{0:{fill}{width}.{prec}f}".format(current_num,
                fill=pad.decode('string_escape'),
-               width=length, prec=precision)) 
+               width=length, prec=precision) 
          elif(value_type == 'R' or value_type == 'r'):
-            print("{0:{fill}{width}}".format(getRomanString(current_num,
-               value_type), fill=pad, width=length))
+            output_string="{0:{fill}{width}}".format(getRomanString(current_num,
+               value_type), fill=pad, width=length)
          else:
-            print("{0:{fill}{width}}".format(getCharString(int(current_num), 
-               value_type), fill=pad, width=length))
+            output_string = "{0:{fill}{width}}".format(getCharString(int(current_num), 
+               value_type), fill=pad, width=length)
 
       # Print with special formatting. We need a try here because the
       # format is coming directly from the user and may be incorrect
       elif args.string_format != None:
          try:
-            print(args.string_format % current_num)
+            output_string = args.string_format % current_num
          except ValueError:
             print("That format is not accepted.")
             exit(1)
 
-      # Print with separator. See:
-      # http://stackoverflow.com/questions/255147/
-      #   how-do-i-keep-python-print-from-adding-spaces
-      # Print while evaluating backslash escapes:
-      # http://stackoverflow.com/questions/4020539/process-escape-sequences-in-a-string-in-python
-      elif args.separator != None or args.words == True:
-         if(value_type == 'f' or value_type == 'i'):
-            print("{0:g}".format(current_num), end='')
-         elif(value_type == 'R' or value_type == 'r'):
-            print(getRomanString(current_num, value_type), end='')
-         else:
-            print(getCharString(int(current_num), value_type), end='')
-         print(sep.decode('string_escape'), end="") 
-
       # Print with floating specified. This will print with decimal point 
       elif(args.format_word == 'floating'):
-         print(current_num)
+         output_string = current_num
 
       # Normal printing (no options).
       else:
          if(value_type == 'f' or value_type == 'i'):
-            print("{0:.{prec}f}".format(current_num, prec=precision))
+            output_string = "{0:.{prec}f}".format(current_num, prec=precision)
          elif(value_type == 'R' or value_type == 'r'):
-            print(getRomanString(current_num, value_type))
+            output_string = getRomanString(current_num, value_type)
          else:
-            print(getCharString(int(current_num), value_type))
+            output_string = getCharString(int(current_num), value_type)
+
+      if(args.separator != None or args.words == True or args.nlines == True):
+         output_string += sep.decode('string_escape')
+         if(args.nlines == True):
+            line = sys.stdin.readline()
+            if line:
+               output_string += line
+         print(output_string, end="")
+      else:
+         print(output_string)
 
       # Increment by specified incrementer (defaults to 1)
       current_num += increment.num
@@ -586,6 +582,10 @@ parser.add_argument('-F', '--format_word',
    help='Print with arabic (for integers), floating, alpha (for characters), '+ 
    'ALPHA (for capital characters), roman (for roman numerals), ROMAN (for '+
    'capital roman numerals).') 
+parser.add_argument('-n', '--number-lines',  dest='nlines', 
+   action='store_true',
+   help='Take a file from standard input, number the lines, and output to '+
+   'standard output')
 group.add_argument('-f', '--format', dest='string_format', 
    help='Print with special formatting: %%x, %%X, %%g, %%G, %%f, %%F', 
    nargs='?')
