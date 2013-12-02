@@ -88,3 +88,11 @@ c
 b d
 d -1 b
 -w a 6 ae
+-w ae -6 a
+-s . a 1 e 
+-s . e -1 a
+-F alpha e
+-F ALPHA E
+-F ALPHA E -1 A
+-F ALPHA -w A 6 AE
+

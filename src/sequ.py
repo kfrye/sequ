@@ -276,7 +276,7 @@ def parseFormatWord(args, first, last, increment):
 
    # If alpha, check that the arguments can parse as alpha
    if(format_word == 'alpha' or format_word == 'ALPHA'):
-      pdb.set_trace()
+      #pdb.set_trace()
       if(isUpperAlpha(args.last) and format_word == 'ALPHA'):
          value_type = 'A'
       elif(isLowerAlpha(args.last) and format_word == 'alpha'):
@@ -545,6 +545,10 @@ def print_output(args, inputs):
          else:
             print(getCharString(int(current_num), value_type), end='')
          print(sep.decode('string_escape'), end="") 
+
+      # Print with floating specified. This will print with decimal point 
+      elif(args.format_word == 'floating'):
+         print(current_num)
 
       # Normal printing (no options).
       else:
