@@ -93,6 +93,16 @@ def get_max_length_roman(first, last, increment):
 
    return max_length
 
+# Get the maximum length of character strings
+def get_max_length_alpha(first, last, input_type):
+   first_length = len(getCharString(first, input_type))
+   last_length = len(getCharString(last, input_type))
+   if(first_length > last_length):
+      max_length = first_length
+   else:
+      max_length = last_length
+   return max_length
+ 
 def isRoman(num):
    if roman.romanNumeralPattern.search(num):
       return True
@@ -239,14 +249,14 @@ def parseFormatWord(args, first, last, increment):
    format_word = args.format_word
    value_type = last.value_type
 
-   print("Format word: ", format_word)
+   #print("Format word: ", format_word)
    # If roman, check that the arguments can parse as roman
    if(format_word == 'roman' or format_word == 'ROMAN'):
       if((isUpperRoman(args.last) == True and format_word == 'ROMAN') or
          (last.value_type == 'i' and format_word == 'ROMAN')):
          value_type = 'R'
       
-      if((isLowerRoman(args.last) == True and format_word == 'roman') or
+      elif((isLowerRoman(args.last) == True and format_word == 'roman') or
          (last.value_type == 'i' and format_word == 'roman')):
          value_type = 'r'
       
@@ -318,8 +328,8 @@ def parseFormatWord(args, first, last, increment):
 # This function runs a few checks of the input for validity
 def check_inputs(args):
    last = SequValue(args.last)
-#   print("Last type: ", last.value_type)
-#   print("Last: ", last.num)
+   #print("Last type: ", last.value_type)
+   #print("Last: ", last.num)
    if(last.value_type == '0'):
       print('The "last" value is not valid')
       exit(1)
@@ -348,14 +358,17 @@ def check_inputs(args):
          print("The arguments do not agree with the specified format word")
          exit(1)
       else:
-         # If we changed the format type to roman, make sure the 
-         # first and increment format types are also set to roman
+         # If changing from an int to roman, change the format, but not the
+         # value. When changing from an alpha to a roman, change both
+         # setType changes both.  
          if(last.value_type == 'i' and 
             (parse_format_word[1] == 'r' or parse_format_word[1] == 'R')):
-            last.value_type = 'r' 
+            last.value_type = parse_format_word[1] 
          else:   
             last.setType(parse_format_word[1])
 
+         # If we changed the format type to roman, make sure the 
+         # first and increment format types are also set to roman
          if(last.value_type == 'r'):
             if(args.first != None and first.value_type != 'i'):
                first.setType('r')
@@ -371,43 +384,52 @@ def check_inputs(args):
                increment.setType('R')
             if(args.first == None):
                first = setDefaults('R') 
-         
+
+   # Set a flag in order to combine error messages later
+   not_matching = False
+
+   # Check arguments when last is an alpha 
    if(last.value_type == 'a' or last.value_type == 'A'):
       if(args.first != None):
          if(first.value_type != last.value_type):
-            print("The 'first' and 'last' arguments must be of the same type")
-            exit(1)
+            not_matching = True
 
       if(args.increment != None):
          if(increment.value_type != 'i'):
             print("Alpha arguments must use an arabic (integer) increment")
             exit(1)
- 
+
+      if(args.string_format != None):
+         print("Alpha arguments cannot be used with the special format option.")
+         exit(1)
+
+   # Check arguments when last is an int 
    elif(last.value_type == 'i'):
       if(args.first != None):
          if(first.value_type != 'i' and first.value_type != 'f'):
-            print("The 'first' and 'last' argument must be of the same type")
-            exit(1)
+            not_matching = True
 
       if(args.increment != None):
          if(increment.value_type != 'i' and 
             increment.value_type != first.value_type):
-            print("The 'first' and 'increment' arguments must be of the same "+
-               "type")
-            exit(1)
+            not_matching = True
 
+   # Check arguments when last is a float
    elif(last.value_type == 'f'):
       if(args.first != None):
          if(first.value_type != 'i' and first.value_type != last.value_type):
-            print("The 'first' and 'last' arguments must be of the same type")
-            exit(1)
+            not_matching = True
 
       if(args.increment != None):
          if(increment.value_type != last.type and increment_value_type != 'i'):
-            print("The 'increment' and 'last' arguments must be of the same "+
-               "type")
-            exit(1) 
+            not_matching = True
 
+   # This combines some error messages found above
+   if(not_matching == True):
+      print("The 'increment' and 'last' arguments must be of the same type")
+      exit(1)
+
+   # Check arguments when last is roman
    elif(last.value_type == 'r' or last.value_type == 'R'):
       if(last.num > 4999 or first.num > 4999 or increment.num > 4999):
          print("Roman numbers may only be used with numbers up to 4999.")
@@ -460,12 +482,16 @@ def print_output(args, inputs):
          length = get_max_length(first.num, last.num, increment.num, precision)
       elif(last.value_type == 'r' or last.value_type == 'R'):
          length = get_max_length_roman(first.num, last.num, increment.num)
+      elif(last.value_type == 'a' or last.value_type == 'A'):
+         length = get_max_length_alpha(first.num, last.num, last.value_type)
+
       if(args.pad != None):
          pad = str(args.pad)
       elif(args.equalwidth == True):
          if(last.value_type == 'f' or last.value_type == 'i'):
             pad = '0'
-         elif(last.value_type == 'r' or last.value_type == 'R'):
+         elif(last.value_type == 'r' or last.value_type == 'R' or
+              last.value_type == 'a' or last.value_type == 'A'):
             pad = ' '
       elif(args.padspaces == True):
          pad = ' '
@@ -494,7 +520,9 @@ def print_output(args, inputs):
             print("{0:{fill}{width}}".format(getRomanString(current_num,
                value_type), fill=pad, width=length))
          else:
-            print(chr(current_num))
+            print("{0:{fill}{width}}".format(getCharString(int(current_num), 
+               value_type), fill=pad, width=length))
+
       # Print with special formatting. We need a try here because the
       # format is coming directly from the user and may be incorrect
       elif args.string_format != None:
@@ -513,9 +541,9 @@ def print_output(args, inputs):
          if(value_type == 'f' or value_type == 'i'):
             print("{0:g}".format(current_num), end='')
          elif(value_type == 'R' or value_type == 'r'):
-            print(getRomanString(current_num, value_type))
+            print(getRomanString(current_num, value_type), end='')
          else:
-            print(chr(int(current_num)))
+            print(getCharString(int(current_num), value_type), end='')
          print(sep.decode('string_escape'), end="") 
 
       # Normal printing (no options).
