@@ -2,8 +2,8 @@
 
 # Copyright 2013 Kristina Frye
 # CS 300
-# sequ command, Compliance Level 2
-# November 16, 2013 
+# sequ command, Compliance Level 3 and 4 
+# December 2, 2013 
 #
 
 # argparse allows us to easily parse the input arguments
@@ -102,18 +102,21 @@ def get_max_length_alpha(first, last, input_type):
    else:
       max_length = last_length
    return max_length
- 
-def isRoman(num):
-   if roman.romanNumeralPattern.search(num):
+
+# Determine if a given string parses as a roman numeral 
+def isRoman(s):
+   if roman.romanNumeralPattern.search(s):
       return True
    else:
       return False
 
+# Determine if a given string is an uppercase roman numeral
 def isUpperRoman(s):
    if isRoman(s.upper()) and isUpperAlpha(s):
       return True
    return False
 
+# Determine if a given string is a lowercase roman numeral
 def isLowerRoman(s):
    if isRoman(s.upper()) and isLowerAlpha(s):
       return True
@@ -128,17 +131,20 @@ def isFloat(input_string):
    except ValueError:
       return False
 
+# Determine if a string is an integer
 def isInteger(input_string):
    if(isFloat(input_string)):
       if(float(input_string).is_integer()):
          return True
    return False
 
+# Determine if a string is upper-case alpha
 def isUpperAlpha(input_string):
    if(str(input_string).isupper()):
       return True
    return False
 
+# Determine if a string is lower-case alpha
 def isLowerAlpha(input_string):
    if(str(input_string).islower()):
       return True
@@ -307,7 +313,7 @@ def parseFormatWord(args, first, last, increment):
       if(args.increment != None and increment.value_type != 'i'):
          isParsed = False
 
-   # If floating, check that allt he other arguments can be parsed as floats
+   # If floating, check that all the other arguments can be parsed as floats
    elif(format_word == 'floating'):
       if(isFloat(args.last) == True):
          value_type = 'f'
@@ -332,33 +338,23 @@ def parseFormatWord(args, first, last, increment):
 # This function runs a few checks of the input for validity
 def check_inputs(args):
    last = SequValue(args.last)
-#  print("Last type: ", last.value_type)
-#  print("Last: ", last.num)
    if(last.value_type == '0'):
       print('The "last" value is not valid')
       exit(1)
 
    if(args.first != None):
-#      pdb.set_trace()
       first = SequValue(args.first)
-#     print("First: ", first.num)
-#     print("First type: ", first.value_type)
    else:
       first = setDefaults(last.value_type)
 
    if(args.increment != None):
-#     pdb.set_trace()
       increment = SequValue(args.increment)
    else:
       increment = SequValue("1") 
 
-#   print("Increment: ", increment.num)
- 
    if(args.format_word != None):
       # Check the arguments and the format word agree
       parse_format_word = parseFormatWord(args, first, last, increment)
-      #print("Parse format word: ", parse_format_word[0], parse_format_word[1])
-   #  pdb.set_trace()
       if(parse_format_word[0] == False):
          print("The arguments do not agree with the specified format word")
          exit(1)
@@ -415,8 +411,7 @@ def check_inputs(args):
             not_matching = True
 
       if(args.increment != None):
-         if(increment.value_type != 'i' and 
-            increment.value_type != first.value_type):
+         if(increment.value_type != 'i' and increment.value_type != 'f'):
             not_matching = True
 
    # Check arguments when last is a float
@@ -464,7 +459,6 @@ def check_inputs(args):
          print("You need to specify a one character padding.")
          exit(1)
 
-#   print("Got to end of parse function")
    return first, last, increment
 
 # This function prints the number sequence

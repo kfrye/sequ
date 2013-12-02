@@ -1,0 +1,72 @@
+Kristina Frye
+CS 300
+November 26, 2013
+CL3 and CL4
+
+CL3:
+
+Compliance Level 3 of sequ adds the ability to have sequences of types other
+than floating-point numbers.
+
+Specifically, CL3 sequ MUST accept as arguments and output as results:
+arbitrary-precision integers, single lowercase alphabetic (ASCII) letters,
+single uppercase alphabetic (ASCII) letters, and lowercase or uppercase unsigned
+Roman Numerals.
+
+The sequ command MUST accept a new flag, "--format-word" or "-F", that takes a
+one-word argument indicating the type of the sequence. The sequ command MUST
+accept the format-word arguments "arabic" (for integers), "floating", "alpha"
+(for letters), "ALPHA", "roman" or "ROMAN"; the all-uppercase variants indicate
+uppercase sequences.
+
+The sequ command MUST accept limit arguments (start, end, and increment) in the
+format consistent with the format-word. Arabic limit arguments MAY be "promoted"
+to Roman Numerals when Roman output is requested. The increment argument for
+alpha formats MUST be arabic. Otherwise, the limit arguments MUST be in the same
+format as the format-word. When no format-word is given, the format MUST be
+inferred from the format of the mandatory end argument.
+
+CL4:
+
+Compliance Level 4 of sequ adds the ability to number the lines of a textfile
+presented on the input.
+
+CL4 sequ MUST accept the "--number-lines" / "-n" argument. This argument
+indicates that, rather than outputting the sequence on standard output, sequ
+will act as a filter, numbering lines of a file read from standard input to
+standard output. Each line "number" will be in the format specified by the
+"--format-word" argument, or inferred from the start or increment limit argument
+if the "--format-word" argument is not supplied. The end argument is irrelevant
+when "--number-lines" is supplied; it MUST NOT be accepted. The separator
+between the line number and the line may be given by the "--separator" argument,
+defaulting to space.
+---
+
+Found library for roman numbers here: https://pypi.python.org/pypi/roman/
+Downloaded package and moved roman.py into my src directory so I can
+use it with sequ.
+
+I can use roman.py to convert integers to roman, roman to integer, and to
+find out if a string is a valid roman numeral.
+
+In order to increment roman numbers, I can get the integer equivalent, increment
+the number, and convert the new integer back to roman format.
+
+I will need to change my argparse setup. Currently it converts all inputs to
+floats. I will need to parse them as strings and then see if they are ints,
+floats, romans, or alphas.
+
+---
+
+Although this is not a requirement, I wanted to be able to print sequences of
+alpha characters that are longer than 27. So I implemented the sequencing of
+characters such that z is followed by aa, which is followed by ab, etc. Since
+characters always take precedence over roman, this means that all roman
+characters are also valid alpha strings. Therefore, roman will only be used when
+specified by the user with the -F/--format_word roman option.
+
+Also, I have coded my parser such that non-fractional numbers are always parsed
+as ints instead of being classified as floats. That is, a '1' will always be
+classified as an int whereas 1.1 is classified as a float. This affects my logic
+because ints are valid limit arguments for floats, but floats are not valid
+limit arguments for integers.
