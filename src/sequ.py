@@ -149,14 +149,14 @@ def isLowerAlpha(input_string):
 # 'f' for float, and '0' for none of the above, Since alpha always has
 # preference over roman, roman is never set as the default type
 def getType(s):
-   if(s.isupper()):
+   if(isInteger(s)):
+      return 'i'
+   elif(isFloat(s)):
+      return 'f'
+   elif(s.isupper()):
       return 'A'
    elif(s.islower()):
       return 'a'
-   elif(isInteger(s)):
-      return 'i'
-   elif(isFloat(s)):
-      return 'f' 
    else:
       return '0'
 
@@ -275,7 +275,7 @@ def parseFormatWord(args, first, last, increment):
             isParsed = False
 
    # If alpha, check that the arguments can parse as alpha
-   if(format_word == 'alpha' or format_word == 'ALPHA'):
+   elif(format_word == 'alpha' or format_word == 'ALPHA'):
       #pdb.set_trace()
       if(isUpperAlpha(args.last) and format_word == 'ALPHA'):
          value_type = 'A'
@@ -295,7 +295,7 @@ def parseFormatWord(args, first, last, increment):
             isParsed = False
 
    # If arabic, check that all the other arguments are also integer
-   if(format_word == 'arabic'):
+   elif(format_word == 'arabic'):
       if(last.value_type != 'i'):
          isParsed = False
       else:
@@ -308,7 +308,7 @@ def parseFormatWord(args, first, last, increment):
          isParsed = False
 
    # If floating, check that allt he other arguments can be parsed as floats
-   if(format_word == 'floating'):
+   elif(format_word == 'floating'):
       if(isFloat(args.last) == True):
          value_type = 'f'
       else:
@@ -320,6 +320,10 @@ def parseFormatWord(args, first, last, increment):
       if(args.increment != None and isFloat(args.increment) == False):
          isParsed = False
 
+   else:
+      print("That format word is not recognized.")
+      exit(1)
+
    # Return whether arguments passed checks and the input_type for the
    # last argument
    return isParsed, value_type
@@ -328,8 +332,8 @@ def parseFormatWord(args, first, last, increment):
 # This function runs a few checks of the input for validity
 def check_inputs(args):
    last = SequValue(args.last)
-   #print("Last type: ", last.value_type)
-   #print("Last: ", last.num)
+#  print("Last type: ", last.value_type)
+#  print("Last: ", last.num)
    if(last.value_type == '0'):
       print('The "last" value is not valid')
       exit(1)
@@ -337,7 +341,8 @@ def check_inputs(args):
    if(args.first != None):
 #      pdb.set_trace()
       first = SequValue(args.first)
-#      print("First: ", first.num)
+#     print("First: ", first.num)
+#     print("First type: ", first.value_type)
    else:
       first = setDefaults(last.value_type)
 
@@ -421,7 +426,8 @@ def check_inputs(args):
             not_matching = True
 
       if(args.increment != None):
-         if(increment.value_type != last.type and increment_value_type != 'i'):
+         if(increment.value_type != last.value_type and 
+            increment.value_type != 'i'):
             not_matching = True
 
    # This combines some error messages found above
