@@ -29,30 +29,23 @@ def continue_loop(current_num, last, increment):
    return run_loop
 
 # This function gets the maximum precision needed by the numbers
-# It is only used when the equal-width option is selected
 # http://stackoverflow.com/questions/6189956/easy-way-of-finding-decimal-places
 def get_max_precision(first, last, increment):
-   max_dec_length = 0
-   current_num = first
-   run_loop = True
-    
-   # I am running a loop over all the numbers because some middle numbers
-   # may need more decimal places than the first and last numbers. 
-   while(run_loop == True):
-      if(current_num.is_integer()):
-         dec_length = 0
-      else:
-         dec_length = abs(Decimal(str(current_num)).as_tuple().exponent) 
-      # The magic number '28' has been added below because sometimes
-      # floating point representations aren't correct. We are
-      # going to ignore representations more than 28 decimal places
-      # and truncate them 
-      if(max_dec_length < dec_length and dec_length < 28):
+   if(first.is_integer()):
+      max_dec_length = 0
+   else:
+      max_dec_length = abs(Decimal(str(first)).as_tuple().exponent)
+
+   if(last.is_integer() == False):
+      dec_length = abs(Decimal(str(last)).as_tuple().exponent)
+      if(dec_length > max_dec_length):
          max_dec_length = dec_length
 
-      current_num += increment
-      run_loop = continue_loop(current_num, last, increment)
-
+   if(increment.is_integer() == False):
+      dec_length = abs(Decimal(str(increment)).as_tuple().exponent)
+      if(dec_length > max_dec_length):
+         max_dec_length = dec_length
+ 
    return max_dec_length
  
 # This function gets the maximum width needed by the formatted number
@@ -451,7 +444,11 @@ def check_inputs(args):
    if(abs(last.num - first.num) > 100000000):
       print("The range between first and last must be less than 100000000.")
       exit(1) 
-   
+  
+   if((args.equalwidth == True or args.pad != None) and args.nlines == True):
+      print("You can't use the 'pad' or 'equal-width' options with the "+
+         "print-lines option.")
+      exit(1) 
    # limit pad characters, but allow backslash escapes by checking for
    # two character pad in which the first character is '\'
    if(args.pad != None):
@@ -551,6 +548,8 @@ def print_output(args, inputs):
             line = sys.stdin.readline()
             if line:
                output_string += line
+            else:
+               exit(0) 
          print(output_string, end="")
       else:
          print(output_string)
@@ -560,10 +559,39 @@ def print_output(args, inputs):
       
       # round to avoid bad floating point representations
       current_num = round(current_num, precision)
-      run_loop = continue_loop(current_num, last.num, increment.num)
-    
+      if(args.nlines == False):
+         run_loop = continue_loop(current_num, last.num, increment.num)
+       
    # Success!
    exit(0)
+
+class ParsedArgs:
+   def __init__(self, args):
+      self.first = args.first
+      self.last = args.last
+      self.increment = args.increment
+      self.nlines = args.nlines
+      self.format_word = args.format_word
+      self.string_format = args.string_format
+      self.equalwidth = args.equalwidth
+      self.separator = args.separator
+      self.pad = args.pad
+      self.padspaces = args.padspaces
+      self.words = args.words
+      if(args.first == None):
+         if(args.nlines == False):
+            print("Either the 'last' argument or -n (used with stdin) needs "+
+               "to be specified.")
+            exit(1)
+         else:
+            self.last = '1'
+      elif(args.increment == None):
+         self.first = None
+         self.last = args.first
+      elif(args.last == None):
+         self.last = args.increment
+         self.increment = None
+           
 
 ########################################################################
 # The following is the script that is always run with sequ
@@ -577,15 +605,13 @@ parser.add_argument('first',
    help='The starting integer (default=1)', nargs='?')
 parser.add_argument('increment', 
    help='The increment between numbers (default=1)', nargs='?')
-parser.add_argument('last', help='The ending integer')
+parser.add_argument('last', help='The ending integer', nargs='?')
+parser.add_argument('-n', '--number-lines', dest='nlines', action='store_true',
+   help="Add numbers to stdin and output to stdout.")
 parser.add_argument('-F', '--format_word', 
    help='Print with arabic (for integers), floating, alpha (for characters), '+ 
    'ALPHA (for capital characters), roman (for roman numerals), ROMAN (for '+
    'capital roman numerals).') 
-parser.add_argument('-n', '--number-lines',  dest='nlines', 
-   action='store_true',
-   help='Take a file from standard input, number the lines, and output to '+
-   'standard output')
 group.add_argument('-f', '--format', dest='string_format', 
    help='Print with special formatting: %%x, %%X, %%g, %%G, %%f, %%F', 
    nargs='?')
@@ -603,14 +629,18 @@ group.add_argument('-P', '--pad-spaces', dest='padspaces', action='store_true',
 group.add_argument('-W', '--words', action='store_true', 
    help='Separate output with space instead of new line')
 
-if(sys.argv[1] == '-v' or sys.argv[1] == '--version'):
-   print(get_version())
-   exit(0)
  
 try:
+   if(sys.argv[1] == '-v' or sys.argv[1] == '--version'):
+      print(get_version())
+      exit(0)
    args = parser.parse_args()
+except IndexError:
+   print("Use sequ -h for help.")
+   exit(1)
 except SystemExit:
    exit(1)
 
-inputs = check_inputs(args)
-print_output(args, inputs)
+pargs = ParsedArgs(args)
+inputs = check_inputs(pargs)
+print_output(pargs, inputs)

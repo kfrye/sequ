@@ -2,6 +2,8 @@ Kristina Frye
 CS 300
 November 30, 2013
 
+CL4: Add numbers to lines from stdin and output to stdout
+
 CL3: Print with alpha, roman, and int formatting
 
 Turn an ascii number into an alpha:
