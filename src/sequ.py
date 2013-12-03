@@ -275,7 +275,6 @@ def parseFormatWord(args, first, last, increment):
 
    # If alpha, check that the arguments can parse as alpha
    elif(format_word == 'alpha' or format_word == 'ALPHA'):
-      #pdb.set_trace()
       if(isUpperAlpha(args.last) and format_word == 'ALPHA'):
          value_type = 'A'
       elif(isLowerAlpha(args.last) and format_word == 'alpha'):
@@ -330,6 +329,8 @@ def parseFormatWord(args, first, last, increment):
 
 # This function runs a few checks of the input for validity
 def check_inputs(args):
+   # Create objects for first, last, and increment that store the
+   # string, type, and numeric value of each number. 
    last = SequValue(args.last)
    if(last.value_type == '0'):
       print('The "last" value is not valid')
@@ -450,11 +451,14 @@ def check_inputs(args):
    if(abs(last.num - first.num) > 100000000):
       print("The range between first and last must be less than 100000000.")
       exit(1) 
-  
+
+   # Don't allow equal-width or pad options when numbers-lines is specified
+   # since the ending number is undetermined.  
    if((args.equalwidth == True or args.pad != None) and args.nlines == True):
       print("You can't use the 'pad' or 'equal-width' options with the "+
          "print-lines option.")
       exit(1) 
+
    # limit pad characters, but allow backslash escapes by checking for
    # two character pad in which the first character is '\'
    if(args.pad != None):
@@ -550,6 +554,9 @@ def print_output(args, inputs):
          else:
             output_string = getCharString(int(current_num), value_type)
 
+      # When using separator or print-lines, we want to be able to append
+      # the separator (or stdin line) to the number instead of starting
+      # a new line right away
       if(args.separator != None or args.words == True or args.nlines == True):
          output_string += sep.decode('string_escape')
          if(args.nlines == True):
@@ -557,7 +564,7 @@ def print_output(args, inputs):
             if line:
                output_string += line
             else:
-               exit(0) 
+               exit(0) # exit when stdin is complete 
          print(output_string, end="")
       else:
          print(output_string)
@@ -567,12 +574,18 @@ def print_output(args, inputs):
       
       # round to avoid bad floating point representations
       current_num = round(current_num, precision)
+
+      # Check if we should go to the next loop. When number-lines is 
+      # specified, this is always true. The exit for that option is
+      # above
       if(args.nlines == False):
          run_loop = continue_loop(current_num, last.num, increment.num)
        
    # Success!
    exit(0)
 
+# This class is used to parse the input arguments since I can't figure out
+# how to make argparse handle the dependencies needed to implement CL4
 class ParsedArgs:
    def __init__(self, args):
       self.first = args.first
@@ -646,7 +659,6 @@ group.add_argument('-P', '--pad-spaces', dest='padspaces', action='store_true',
 group.add_argument('-W', '--words', action='store_true', 
    help='Separate output with space instead of new line')
 
- 
 try:
    if(sys.argv[1] == '-v' or sys.argv[1] == '--version'):
       print(get_version())
