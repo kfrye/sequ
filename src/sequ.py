@@ -15,7 +15,7 @@ import roman
 import pdb
 
 def get_version():
-   return 'sequ version 1.20, written by Kristina Frye'
+   return 'sequ version 1.30, written by Kristina Frye'
 
 # This function determines if a loop should continue given the current number,
 # the increment, and the last number
@@ -330,6 +330,7 @@ def parseFormatWord(args, first, last, increment):
 
 # This function runs a few checks of the input for validity
 def check_inputs(args):
+   print("Inside check_inputs")
    last = SequValue(args.last)
    if(last.value_type == '0'):
       print('The "last" value is not valid')
@@ -433,11 +434,11 @@ def check_inputs(args):
          exit(1)
 
    # Exit with success if nothing to print
-   if(first.num > last.num):
+   if(first.num > last.num and args.nlines == False):
       if(increment.num > 0):
          exit(0) 
    else:
-      if(increment.num < 0):
+      if(increment.num < 0 and args.nlines == False):
          exit(0)
 
    # Limit the range so my computer doesn't run out of memory
@@ -457,6 +458,8 @@ def check_inputs(args):
          exit(1)
 
    return first, last, increment
+
+
 
 # This function prints the number sequence
 def print_output(args, inputs):
@@ -585,6 +588,15 @@ class ParsedArgs:
             exit(1)
          else:
             self.last = '1'
+
+      elif(args.first != None and args.nlines == True):
+         if(args.last != None):
+            print("The 'last' argument cannot be specified at the same time "+
+               "as the --number-lines option is used.")
+            exit(1)
+         else:
+            self.last = '1'
+
       elif(args.increment == None):
          self.first = None
          self.last = args.first
@@ -642,5 +654,8 @@ except SystemExit:
    exit(1)
 
 pargs = ParsedArgs(args)
+print("first: ", pargs.first)
+print("last: ", pargs.last)
+print("increment: ", pargs.increment)
 inputs = check_inputs(pargs)
 print_output(pargs, inputs)

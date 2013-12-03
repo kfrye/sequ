@@ -70,3 +70,27 @@ as ints instead of being classified as floats. That is, a '1' will always be
 classified as an int whereas 1.1 is classified as a float. This affects my logic
 because ints are valid limit arguments for floats, but floats are not valid
 limit arguments for integers.
+
+---
+December 2, 2013
+Worked on CL4 today. Because adding the -n argument makes the 'last' argument
+not allowed when -n is enabled, the existing argparse setup no longer worked. In
+order to preserve the operation of the rest of the functions, I added a
+ParsedArgs class in order to parse the arguments correctly. When this class is
+initialized, it is passed the input args. Then it puts the "first" "last" and
+"increment" values in the correct order, depending upon which arguments are
+specified. An object of this new class is then passed to the other functions of
+the program, which treat it just like it treated the original arguments.
+
+I disabled --pad and --equal-width when --number-lines is specified because
+there is no way to find out what the maximum length of the numbers is going to
+be since the ending number is not determined.
+
+I changed the get_max_precision function to not loop over all the numbers as it
+did in the past. This is way more efficient, but it's not as correct because
+sometimes the last number is not reached, but it contains higher precision than
+the other two arguments. For example: 1 1 4.2. This will have a max precision of
+'1' but the output should be: 1 2 3 4 instead of 1.0 2.0 3.0 4.0 because 4.2 is
+never reached. However, this is pretty minor and is probably okay in the big
+scheme of things. The new get_max_precision function can be used when -n is
+specified because it doesn't loop over all the numbers as it did previously.
