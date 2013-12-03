@@ -330,7 +330,6 @@ def parseFormatWord(args, first, last, increment):
 
 # This function runs a few checks of the input for validity
 def check_inputs(args):
-   print("Inside check_inputs")
    last = SequValue(args.last)
    if(last.value_type == '0'):
       print('The "last" value is not valid')
@@ -399,7 +398,7 @@ def check_inputs(args):
          exit(1)
 
    # Check arguments when last is an int 
-   elif(last.value_type == 'i'):
+   elif(last.value_type == 'i' and args.nlines == False):
       if(args.first != None):
          if(first.value_type != 'i' and first.value_type != 'f'):
             not_matching = True
@@ -421,7 +420,7 @@ def check_inputs(args):
 
    # This combines some error messages found above
    if(not_matching == True):
-      print("The 'increment' and 'last' arguments must be of the same type")
+      print("The limit arguments must be of the same type")
       exit(1)
 
    # Check arguments when last is roman
@@ -432,6 +431,12 @@ def check_inputs(args):
       if(args.string_format != None):
          print("Roman numbers cannot be used with the special format option.")
          exit(1)
+
+   # When number-lines option is specified, we want to use the format type
+   # of the 'first' argument instead of the 'last' argument, so we fake
+   # it out this way. 
+   if(args.nlines == True):
+      last.value_type = first.value_type
 
    # Exit with success if nothing to print
    if(first.num > last.num and args.nlines == False):
@@ -654,8 +659,5 @@ except SystemExit:
    exit(1)
 
 pargs = ParsedArgs(args)
-print("first: ", pargs.first)
-print("last: ", pargs.last)
-print("increment: ", pargs.increment)
 inputs = check_inputs(pargs)
 print_output(pargs, inputs)
