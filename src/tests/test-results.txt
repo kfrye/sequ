@@ -117,3 +117,4 @@ Test -F ROMAN -s . 3: passed
 Test -F ROMAN -P 3: passed
 Test -F ROMAN -W 4: passed
 Test -F ROMAN -p . V: passed
+Test -n < test.txt: failed

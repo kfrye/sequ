@@ -173,6 +173,11 @@ def fromCharString(s):
 
 # Converts a numeric string into a character string
 def getCharString(num, input_type):
+   # We can't have negative characters, so use 'a' or 'A' for numbers
+   # decremented below a 
+   if(num < ord('a') and input_type == 'a' or
+      num < ord('A') and input_type == 'A'):
+      return input_type 
    if(input_type == 'A'):
       num = ord(chr(num).lower())
    num -= ord('a')
@@ -203,13 +208,23 @@ class SequValue:
       self.num = convertToNum(self.value_type, s)
 
    def setType(self, input_type):
+      if(self.value_type != 'i'):
+         self.num = convertToNum(input_type, self.input_string)
       self.value_type = input_type
-      self.num = convertToNum(self.value_type, self.input_string)
 
 # Returns a roman numeral string based upon a number and the type 
 # (lower case vs upper case roman)
 def getRomanString(num, input_type):
-   roman_str = roman.toRoman(int(num))
+   # This error checking handles the occasion when the number is too big
+   # (> 4999) or too small (< 1) to be converted to a roman numeral.
+   try:
+      roman_str = roman.toRoman(int(num))
+   except roman.RomanError:
+      if(input_type == 'r'):
+         return 'i'
+      else:
+         return 'I'
+
    if(input_type == 'R'):
       return roman_str 
    else:
@@ -248,7 +263,7 @@ def parseFormatWord(args, first, last, increment):
    format_word = args.format_word
    value_type = last.value_type
 
-   #print("Format word: ", format_word)
+   print("Value type: ", value_type)
    # If roman, check that the arguments can parse as roman
    if(format_word == 'roman' or format_word == 'ROMAN'):
       if((isUpperRoman(args.last) == True and format_word == 'ROMAN') or
@@ -279,6 +294,11 @@ def parseFormatWord(args, first, last, increment):
          value_type = 'A'
       elif(isLowerAlpha(args.last) and format_word == 'alpha'):
          value_type = 'a'
+      # When using number-lines option, make sure to use the type of the 
+      # 'first' argument since we don't care about the type of 'last'
+      elif(args.nlines == True and 
+         (first.value_type == 'a' or first.value_type == 'A')):
+         value_type = first.value_type
       else:
          isParsed = False
 
@@ -355,27 +375,28 @@ def check_inputs(args):
       else:
          # If changing from an int to roman, change the format, but not the
          # value. When changing from an alpha to a roman, change both
-         # setType changes both.  
+         # setType changes both. 
          if(last.value_type == 'i' and 
             (parse_format_word[1] == 'r' or parse_format_word[1] == 'R')):
             last.value_type = parse_format_word[1] 
+            print("Value type: ", last.value_type)
          else:   
             last.setType(parse_format_word[1])
 
          # If we changed the format type to roman, make sure the 
          # first and increment format types are also set to roman
          if(last.value_type == 'r'):
-            if(args.first != None and first.value_type != 'i'):
+            if(args.first != None):
                first.setType('r')
-            if(args.increment != None and increment.value_type != 'i'):
+            if(args.increment != None):
                increment.setType('r')
             if(args.first == None):
                first = setDefaults('r')
 
          elif(last.value_type == 'R'):
-            if(args.first != None and first.value_type != 'i'):
+            if(args.first != None):
                first.setType('R')
-            if(args.increment != None and increment.value_type != 'i'):
+            if(args.increment != None):
                increment.setType('R')
             if(args.first == None):
                first = setDefaults('R') 
@@ -465,7 +486,6 @@ def check_inputs(args):
       if((len(args.pad) == 2 and args.pad[0] != '\\') and len(args.pad) != 1):
          print("You need to specify a one character padding.")
          exit(1)
-
    return first, last, increment
 
 
@@ -671,5 +691,8 @@ except SystemExit:
    exit(1)
 
 pargs = ParsedArgs(args)
+print("First: ", pargs.first)
+print("Last: ", pargs.last)
+print("Increment: ", pargs.increment)
 inputs = check_inputs(pargs)
 print_output(pargs, inputs)

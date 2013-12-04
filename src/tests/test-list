@@ -117,3 +117,4 @@ d -1 b
 -F ROMAN -P 3
 -F ROMAN -W 4
 -F ROMAN -p . V
+-n < test.txt

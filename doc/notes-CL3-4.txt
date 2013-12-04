@@ -94,3 +94,10 @@ the other two arguments. For example: 1 1 4.2. This will have a max precision of
 never reached. However, this is pretty minor and is probably okay in the big
 scheme of things. The new get_max_precision function can be used when -n is
 specified because it doesn't loop over all the numbers as it did previously.
+
+---Testing---
+Created fake "seq" test results in order to compare them to my actual output.
+The "test-list" document in my src/tests directory contains all the new test
+cases that I used to verify CL3. Test results are in test-results.txt in the
+same directory.
+"
