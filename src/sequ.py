@@ -230,6 +230,30 @@ def getRomanString(num, input_type):
    else:
       return roman_str.lower()
 
+# Returns a string to be used with equal-width printing
+def getEqualWidthString(value_type, current_num, pad, length, precision):
+   if(value_type == 'f' or value_type == 'i'):
+      output_string = "{0:{fill}{width}.{prec}f}".format(current_num,
+         fill=pad.decode('string_escape'),
+         width=length, prec=precision)
+   elif(value_type == 'R' or value_type == 'r'):
+      output_string="{0:{fill}{width}}".format(getRomanString(current_num,
+         value_type), fill=pad, width=length)
+   else:
+      output_string = "{0:{fill}{width}}".format(getCharString(int(current_num),
+         value_type), fill=pad, width=length)
+   return output_string
+
+# Returns string without special formatting
+def getNormalString(value_type, current_num, precision):
+   if(value_type == 'f' or value_type == 'i'):
+      output_string = "{0:.{prec}f}".format(current_num, prec=precision)
+   elif(value_type == 'R' or value_type == 'r'):
+      output_string = getRomanString(current_num, value_type)
+   else:
+      output_string = getCharString(int(current_num), value_type)
+   return output_string
+
 # Recursive function used to get a character sequence from a number.
 # Repeat is set to false when called outside of the function
 def getLetter(num, repeat):
@@ -263,7 +287,7 @@ def parseFormatWord(args, first, last, increment):
    format_word = args.format_word
    value_type = last.value_type
 
-   print("Value type: ", value_type)
+   #print("Value type: ", value_type)
    # If roman, check that the arguments can parse as roman
    if(format_word == 'roman' or format_word == 'ROMAN'):
       if((isUpperRoman(args.last) == True and format_word == 'ROMAN') or
@@ -541,16 +565,8 @@ def print_output(args, inputs):
       value_type = last.value_type
       # Print with specified width and precision (equal-width)
       if(args.equalwidth == True or args.pad != None or args.padspaces == True):
-         if(value_type == 'f' or value_type == 'i'):
-            output_string = "{0:{fill}{width}.{prec}f}".format(current_num,
-               fill=pad.decode('string_escape'),
-               width=length, prec=precision) 
-         elif(value_type == 'R' or value_type == 'r'):
-            output_string="{0:{fill}{width}}".format(getRomanString(current_num,
-               value_type), fill=pad, width=length)
-         else:
-            output_string = "{0:{fill}{width}}".format(getCharString(int(current_num), 
-               value_type), fill=pad, width=length)
+         output_string = getEqualWidthString(value_type, current_num, pad,
+            length, precision)
 
       # Print with special formatting. We need a try here because the
       # format is coming directly from the user and may be incorrect
@@ -563,16 +579,11 @@ def print_output(args, inputs):
 
       # Print with floating specified. This will print with decimal point 
       elif(args.format_word == 'floating'):
-         output_string = current_num
+         output_string = str(current_num)
 
       # Normal printing (no options).
       else:
-         if(value_type == 'f' or value_type == 'i'):
-            output_string = "{0:.{prec}f}".format(current_num, prec=precision)
-         elif(value_type == 'R' or value_type == 'r'):
-            output_string = getRomanString(current_num, value_type)
-         else:
-            output_string = getCharString(int(current_num), value_type)
+         output_string = getNormalString(value_type, current_num, precision)
 
       # When using separator or print-lines, we want to be able to append
       # the separator (or stdin line) to the number instead of starting
@@ -583,8 +594,11 @@ def print_output(args, inputs):
             line = sys.stdin.readline()
             if line:
                output_string += line
+
+            # exit when stdin is complete. This is done here so that we
+            # don't print a number with an empty line 
             else:
-               exit(0) # exit when stdin is complete 
+               exit(0) 
          print(output_string, end="")
       else:
          print(output_string)
@@ -604,8 +618,10 @@ def print_output(args, inputs):
    # Success!
    exit(0)
 
-# This class is used to parse the input arguments since I can't figure out
-# how to make argparse handle the dependencies needed to implement CL4
+# This class is used to parse the input arguments and assign them to
+# "first," "last," and "increment," depending upon which arguments are
+# specified. This allowed me to implement CL4 with only small changes
+# needed to the rest of the program
 class ParsedArgs:
    def __init__(self, args):
       self.first = args.first
@@ -684,6 +700,8 @@ try:
       print(get_version())
       exit(0)
    args = parser.parse_args()
+
+# This exception is thrown if no arguments are given
 except IndexError:
    print("Use sequ -h for help.")
    exit(1)
@@ -691,8 +709,8 @@ except SystemExit:
    exit(1)
 
 pargs = ParsedArgs(args)
-print("First: ", pargs.first)
-print("Last: ", pargs.last)
-print("Increment: ", pargs.increment)
+#print("First: ", pargs.first)
+#print("Last: ", pargs.last)
+#print("Increment: ", pargs.increment)
 inputs = check_inputs(pargs)
 print_output(pargs, inputs)
