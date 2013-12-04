@@ -100,4 +100,13 @@ Created fake "seq" test results in order to compare them to my actual output.
 The "test-list" document in my src/tests directory contains all the new test
 cases that I used to verify CL3. Test results are in test-results.txt in the
 same directory.
-"
+
+Created script to generate test files for -n option: create-sequ-files-n.sh.
+Used same test cases as before except removed test cases that weren't applicable
+and removed third argument from those test cases with 3 arguments since the -n
+option doesn't allow the third argument.
+
+I'm not going to compare them to anything since that is a non-trivial task, but
+no error were generated when those files were created using the script, and the
+files look good. This is just a sanity check to make sure none of the test cases
+throw unexpected errors.
